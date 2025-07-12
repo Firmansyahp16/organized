@@ -1,3 +1,5 @@
+import {authenticate} from '@loopback/authentication';
+import {inject} from '@loopback/core';
 import {
   Count,
   CountSchema,
@@ -18,13 +20,11 @@ import {
   requestBody,
   response,
 } from '@loopback/rest';
+import {SecurityBindings} from '@loopback/security';
 import {Schedules} from '../models';
 import {SchedulesRepository} from '../repositories';
-import {inject} from '@loopback/core';
-import {SecurityBindings} from '@loopback/security';
-import {authenticate} from '@loopback/authentication';
-import {MyUserProfile} from '../services/user.service';
 import {AuthorizationService} from '../services/authorization.service';
+import {MyUserProfile} from '../services/user.service';
 
 export class SchedulesController {
   constructor(
@@ -176,8 +176,10 @@ export class SchedulesController {
   ): Promise<boolean> {
     const schedule = await this.schedulesRepository.findById(id);
     if (
-      !this.authorizationService.isCoachOrAdmin(this.user, schedule.branchId) ||
-      !this.authorizationService.hasGlobalRole(this.user, 'admin')
+      !this.authorizationService.isCoachOfBranch(
+        this.user,
+        String(schedule.branchId),
+      )
     ) {
       throw new HttpErrors.Forbidden("You cannot set schedule's attendance");
     }
@@ -197,5 +199,42 @@ export class SchedulesController {
     } catch (error) {
       throw new HttpErrors.InternalServerError(error.message);
     }
+  }
+
+  @authenticate('jwt')
+  @post('/Schedules/{id}/setMaterial')
+  @response(200, {
+    description: 'Schedules model instance',
+    content: {
+      'application/json': {
+        schema: getModelSchemaRef(Schedules, {includeRelations: true}),
+      },
+    },
+  })
+  async setMaterial(
+    @param.path.string('id') id: string,
+    @requestBody()
+    requestBody: {
+      material: string;
+    },
+  ) {
+    const schedule = await this.schedulesRepository.findById(id);
+    if (
+      !this.authorizationService.isCoachOfBranch(
+        this.user,
+        String(schedule.branchId),
+      )
+    ) {
+      throw new HttpErrors.Forbidden("You cannot set schedule's material");
+    }
+    if (!schedule) {
+      throw new HttpErrors.NotFound('Schedule not found');
+    }
+    if (!requestBody.material.trim().startsWith('#')) {
+      throw new HttpErrors.BadRequest('Material must be in Markdown format');
+    }
+    await this.schedulesRepository.updateById(id, {
+      material: requestBody.material,
+    });
   }
 }
