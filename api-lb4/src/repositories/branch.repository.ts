@@ -1,25 +1,15 @@
-import {inject, Getter} from '@loopback/core';
+import {Getter, inject} from '@loopback/core';
 import {
   DefaultCrudRepository,
-  repository,
   HasManyRepositoryFactory,
-  DataObject,
-  Options,
-  Model,
+  repository,
 } from '@loopback/repository';
+import {customAlphabet} from 'nanoid';
 import {MongoDataSource} from '../datasources';
-import {
-  Branch,
-  BranchRelations,
-  Users,
-  Schedules,
-  Examinations,
-} from '../models';
-import {UsersRepository} from './users.repository';
-import {SchedulesRepository} from './schedules.repository';
-import {customAlphabet, nanoid} from 'nanoid';
-import {PersistedModel} from 'loopback-datasource-juggler';
+import {Branch, BranchRelations, Examinations, Schedules} from '../models';
 import {ExaminationsRepository} from './examinations.repository';
+import {SchedulesRepository} from './schedules.repository';
+import {UsersRepository} from './users.repository';
 
 export class BranchRepository extends DefaultCrudRepository<
   Branch,
