@@ -28,8 +28,8 @@ import {
   SchedulesRepository,
   UsersRepository,
 } from '../repositories';
-import {MyUserProfile} from '../services/user.service';
 import {AuthorizationService} from '../services/authorization.service';
+import {MyUserProfile} from '../services/user.service';
 
 export class BranchController {
   constructor(
@@ -209,7 +209,7 @@ export class BranchController {
     @param.path.string('id') id: string,
     @requestBody() requestBody: {coachIds: string[]},
   ): Promise<boolean> {
-    if (!this.authorizationService.isCoachOrAdmin(this.user, id)) {
+    if (!this.authorizationService.isCoachManager(this.user)) {
       throw new HttpErrors.Forbidden("You cannot set branch's coach");
     }
     const {coachIds} = requestBody;
@@ -286,7 +286,7 @@ export class BranchController {
       resetSchedule: boolean;
     },
   ): Promise<boolean> {
-    if (!this.authorizationService.isCoachOrAdmin(this.user, id)) {
+    if (!this.authorizationService.isCoachOfBranch(this.user, id)) {
       throw new HttpErrors.Forbidden(
         "You are not allowed to modify this branch's schedules",
       );
@@ -350,7 +350,7 @@ export class BranchController {
       examiners: string[];
     },
   ): Promise<boolean> {
-    if (!this.authorizationService.isCoachOrAdmin(this.user, id)) {
+    if (!this.authorizationService.isCoachOfBranch(this.user, id)) {
       throw new HttpErrors.Forbidden(
         "You are not allowed to modify this branch's schedules",
       );

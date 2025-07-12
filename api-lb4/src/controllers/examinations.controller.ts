@@ -1,3 +1,5 @@
+import {authenticate} from '@loopback/authentication';
+import {inject} from '@loopback/core';
 import {
   Count,
   CountSchema,
@@ -7,29 +9,27 @@ import {
   Where,
 } from '@loopback/repository';
 import {
-  post,
-  param,
+  del,
   get,
   getModelSchemaRef,
+  HttpErrors,
+  param,
   patch,
+  post,
   put,
-  del,
   requestBody,
   response,
-  HttpErrors,
 } from '@loopback/rest';
-import {Examinations, Users} from '../models';
+import {SecurityBindings} from '@loopback/security';
+import {Examinations} from '../models';
 import {
   BranchRepository,
   ExaminationsRepository,
   SchedulesRepository,
   UsersRepository,
 } from '../repositories';
-import {inject} from '@loopback/core';
-import {SecurityBindings} from '@loopback/security';
-import {authenticate} from '@loopback/authentication';
-import {MyUserProfile} from '../services/user.service';
 import {AuthorizationService} from '../services/authorization.service';
+import {MyUserProfile} from '../services/user.service';
 
 export class ExaminationsController {
   constructor(
@@ -223,10 +223,7 @@ export class ExaminationsController {
       throw new HttpErrors.BadRequest('Examination must have a branchId.');
     }
 
-    if (
-      !this.authorizationService.hasGlobalRole(this.user, 'admin') &&
-      !this.authorizationService.isCoachOrAdmin(this.user, [branchId])
-    ) {
+    if (!this.authorizationService.isCoachOfBranch(this.user, branchId)) {
       throw new HttpErrors.Forbidden(
         "You cannot set examination's participants",
       );
@@ -350,10 +347,7 @@ export class ExaminationsController {
       p => p.id,
     );
 
-    if (
-      !this.authorizationService.hasGlobalRole(this.user, 'admin') &&
-      !this.authorizationService.isExaminers(this.user, examination)
-    ) {
+    if (!this.authorizationService.isExaminer(this.user, examination)) {
       throw new HttpErrors.Forbidden("You cannot set examination's result");
     }
 
