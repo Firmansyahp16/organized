@@ -1,7 +1,7 @@
-import {Entity, model, property, belongsTo, hasOne} from '@loopback/repository';
+import {belongsTo, Entity, hasOne, model, property} from '@loopback/repository';
+import {Attendances} from './attendances.model';
 import {Branch} from './branch.model';
 import {Users} from './users.model';
-import {Attendances} from './attendances.model';
 
 @model()
 export class Schedules extends Entity {
@@ -25,6 +25,11 @@ export class Schedules extends Entity {
   date: Date;
 
   @property({
+    type: 'string',
+  })
+  material?: string;
+
+  @property({
     type: 'date',
   })
   createdAt?: Date;
@@ -35,13 +40,13 @@ export class Schedules extends Entity {
   updatedAt?: Date;
 
   @belongsTo(() => Branch)
-  branchId: string;
+  branchId?: string;
 
   @belongsTo(() => Users)
-  createdById: string;
+  createdById?: string;
 
   @hasOne(() => Attendances)
-  attendances: Attendances;
+  attendances?: Attendances;
 
   constructor(data?: Partial<Schedules>) {
     super(data);
