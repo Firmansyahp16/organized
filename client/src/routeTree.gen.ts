@@ -11,7 +11,6 @@
 import type { CreateFileRoute, FileRoutesByPath } from '@tanstack/react-router'
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as RegisterRouteImport } from './routes/register'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as NotFoundRouteImport } from './routes/$notFound'
 import { Route as IndexRouteImport } from './routes/index'
@@ -25,11 +24,6 @@ import { Route as UsersIdIndexRouteImport } from './routes/users/$id/index'
 import { Route as EventsIdIndexRouteImport } from './routes/events/$id/index'
 import { Route as BranchIdIndexRouteImport } from './routes/branch/$id/index'
 
-const RegisterRoute = RegisterRouteImport.update({
-  id: '/register',
-  path: '/register',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
@@ -95,7 +89,6 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/$notFound': typeof NotFoundRoute
   '/login': typeof LoginRoute
-  '/register': typeof RegisterRoute
   '/branch/new': typeof BranchNewRoute
   '/events/new': typeof EventsNewRoute
   '/branch': typeof BranchIndexRoute
@@ -110,7 +103,6 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/$notFound': typeof NotFoundRoute
   '/login': typeof LoginRoute
-  '/register': typeof RegisterRoute
   '/branch/new': typeof BranchNewRoute
   '/events/new': typeof EventsNewRoute
   '/branch': typeof BranchIndexRoute
@@ -126,7 +118,6 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/$notFound': typeof NotFoundRoute
   '/login': typeof LoginRoute
-  '/register': typeof RegisterRoute
   '/branch/new': typeof BranchNewRoute
   '/events/new': typeof EventsNewRoute
   '/branch/': typeof BranchIndexRoute
@@ -143,7 +134,6 @@ export interface FileRouteTypes {
     | '/'
     | '/$notFound'
     | '/login'
-    | '/register'
     | '/branch/new'
     | '/events/new'
     | '/branch'
@@ -158,7 +148,6 @@ export interface FileRouteTypes {
     | '/'
     | '/$notFound'
     | '/login'
-    | '/register'
     | '/branch/new'
     | '/events/new'
     | '/branch'
@@ -173,7 +162,6 @@ export interface FileRouteTypes {
     | '/'
     | '/$notFound'
     | '/login'
-    | '/register'
     | '/branch/new'
     | '/events/new'
     | '/branch/'
@@ -189,7 +177,6 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   NotFoundRoute: typeof NotFoundRoute
   LoginRoute: typeof LoginRoute
-  RegisterRoute: typeof RegisterRoute
   BranchNewRoute: typeof BranchNewRoute
   EventsNewRoute: typeof EventsNewRoute
   BranchIndexRoute: typeof BranchIndexRoute
@@ -222,13 +209,6 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/register': {
-      id: '/register'
-      path: '/register'
-      fullPath: '/register'
-      preLoaderRoute: typeof RegisterRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/branch/new': {
@@ -324,15 +304,6 @@ declare module './routes/login' {
     FileRoutesByPath['/login']['fullPath']
   >
 }
-declare module './routes/register' {
-  const createFileRoute: CreateFileRoute<
-    '/register',
-    FileRoutesByPath['/register']['parentRoute'],
-    FileRoutesByPath['/register']['id'],
-    FileRoutesByPath['/register']['path'],
-    FileRoutesByPath['/register']['fullPath']
-  >
-}
 declare module './routes/branch/new' {
   const createFileRoute: CreateFileRoute<
     '/branch/new',
@@ -419,7 +390,6 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   NotFoundRoute: NotFoundRoute,
   LoginRoute: LoginRoute,
-  RegisterRoute: RegisterRoute,
   BranchNewRoute: BranchNewRoute,
   EventsNewRoute: EventsNewRoute,
   BranchIndexRoute: BranchIndexRoute,
