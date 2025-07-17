@@ -1,16 +1,20 @@
+import { useForm } from "@tanstack/react-form";
 import { createColumnHelper } from "@tanstack/react-table";
+import { useState } from "react";
+import { useSetSchedule } from "../../../hooks/branch.hook";
 import {
   useDeleteSchedule,
   useSetAttendance,
+  useSetMaterial,
 } from "../../../hooks/schedule.hook";
-import { useState } from "react";
-import { useForm } from "@tanstack/react-form";
-import { Table } from "../../Table";
+import { Block, serializeMarkdown } from "../../../libs/mdHelper";
 import Card from "../../Card";
 import CheckboxField from "../../Field/CheckboxField";
 import InputField from "../../Field/InputField";
-import { useSetSchedule } from "../../../hooks/branch.hook";
+import { MDBuilder } from "../../MDBuilder";
+import { MDEditor } from "../../MDEditor";
 import { RankBadge } from "../../RankBadge";
+import { Table } from "../../Table";
 
 const helper = createColumnHelper<any>();
 
@@ -215,7 +219,11 @@ export function Schedules({ branch }: { branch: Record<string, any> }) {
     },
   });
   const { mutate: deleteSchedule } = useDeleteSchedule();
+  const { mutate: setMaterial } = useSetMaterial();
   const [showForm, setShowForm] = useState(false);
+  const [openedModalId, setOpenedModalId] = useState<string | null>(null);
+  const [activeBlocks, setActiveBlocks] = useState<Block[]>([]);
+  const [builderState, setBuilderState] = useState<Record<string, Block[]>>({});
   const columns = [
     helper.accessor("title", {
       header: "Title",
@@ -230,6 +238,31 @@ export function Schedules({ branch }: { branch: Record<string, any> }) {
           .format(new Date(info.getValue()))
           .toString(),
     }),
+    helper.display({
+      id: "material",
+      header: "Material",
+      cell: (info) => {
+        const scheduleId = info.row.original.id;
+        const schedule = branch.schedules.find((s: any) => s.id === scheduleId);
+        const material = schedule?.material;
+        const blocks = builderState[scheduleId] || [];
+
+        return (
+          <button
+            className="btn btn-outline btn-accent btn-sm"
+            onClick={() => {
+              setOpenedModalId(scheduleId);
+              setActiveBlocks(blocks.length > 0 ? blocks : []);
+            }}
+          >
+            {material && material.trim() !== ""
+              ? "Edit Material"
+              : "Set Material"}
+          </button>
+        );
+      },
+    }),
+
     helper.display({
       id: "attendanceActions",
       header: "Attendance",
@@ -326,6 +359,31 @@ export function Schedules({ branch }: { branch: Record<string, any> }) {
           </button>
         )}
       </div>
+      <MDEditor
+        id="schedule-material-modal"
+        title="Material"
+        open={openedModalId !== null}
+        onClose={() => setOpenedModalId(null)}
+        mutation={async () => {
+          if (!openedModalId) return;
+
+          const markdown = serializeMarkdown(activeBlocks);
+
+          // Simpan ke server atau state global
+          setMaterial({ id: openedModalId, material: markdown });
+
+          // Simpan blok builder-nya ke state lokal
+          setBuilderState((prev) => ({
+            ...prev,
+            [openedModalId]: activeBlocks,
+          }));
+
+          setOpenedModalId(null);
+        }}
+      >
+        <MDBuilder blocks={activeBlocks} setBlocks={setActiveBlocks} />
+      </MDEditor>
+
       {showForm && (
         <form
           onSubmit={(e) => {
