@@ -11,7 +11,7 @@ const config = {
   password: 'organized_password',
   database: 'organized',
   useNewUrlParser: true,
-  authSource: 'organized',
+  authSource: 'admin',
 };
 
 // Observe application's life cycle to disconnect the datasource when
