@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { instance } from "../libs/axios";
-import { toast } from "react-toastify";
 import { PaginationState } from "@tanstack/react-table";
+import { toast } from "react-toastify";
+import { instance } from "../libs/axios";
 
 export function useSetAttendance(id: string) {
   return useMutation({
@@ -99,6 +99,31 @@ export function useEditSchedule(id: string) {
     },
     onSuccess() {
       toast.success("Schedule edited successfully", {
+        autoClose: 2000,
+        onClose: () => {
+          window.location.reload();
+        },
+      });
+    },
+    onError(error) {
+      toast.error(error.message);
+    },
+  });
+}
+
+export function useSetMaterial() {
+  return useMutation({
+    mutationFn: async (data: { id: string; material: string }) => {
+      const response = await instance.post(
+        `/Schedules/${data.id}/setMaterial`,
+        {
+          material: data.material,
+        }
+      );
+      return response.data;
+    },
+    onSuccess() {
+      toast.success("Material set successfully", {
         autoClose: 2000,
         onClose: () => {
           window.location.reload();
