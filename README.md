@@ -10,7 +10,7 @@ Organized dibangun dengan teknologi sebagai berikut.
 | Bagian | Teknologi |
 | ------ | ------ |
 | Database | MongoDB |
-| Backend | Loopback 4, Typescript |
+| Backend | Loopback 4, Typescript (SEGERA MIGRASI KE NEST)|
 | Frontend | React, Typescript, DaisyUI |
 
 ## Fitur
