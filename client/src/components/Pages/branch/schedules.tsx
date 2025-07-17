@@ -7,7 +7,11 @@ import {
   useSetAttendance,
   useSetMaterial,
 } from "../../../hooks/schedule.hook";
-import { Block, serializeMarkdown } from "../../../libs/mdHelper";
+import {
+  Block,
+  parseMarkdown,
+  serializeMarkdown,
+} from "../../../libs/mdHelper";
 import Card from "../../Card";
 import CheckboxField from "../../Field/CheckboxField";
 import InputField from "../../Field/InputField";
@@ -245,14 +249,22 @@ export function Schedules({ branch }: { branch: Record<string, any> }) {
         const scheduleId = info.row.original.id;
         const schedule = branch.schedules.find((s: any) => s.id === scheduleId);
         const material = schedule?.material;
-        const blocks = builderState[scheduleId] || [];
-
         return (
           <button
             className="btn btn-outline btn-accent btn-sm"
             onClick={() => {
               setOpenedModalId(scheduleId);
-              setActiveBlocks(blocks.length > 0 ? blocks : []);
+
+              const builderBlocks = builderState[scheduleId];
+              if (builderBlocks?.length > 0) {
+                setActiveBlocks(builderBlocks);
+              } else if (material && material.trim() !== "") {
+                const parsed = parseMarkdown(material);
+                setActiveBlocks(parsed);
+                setBuilderState((prev) => ({ ...prev, [scheduleId]: parsed }));
+              } else {
+                setActiveBlocks([]);
+              }
             }}
           >
             {material && material.trim() !== ""
@@ -262,7 +274,6 @@ export function Schedules({ branch }: { branch: Record<string, any> }) {
         );
       },
     }),
-
     helper.display({
       id: "attendanceActions",
       header: "Attendance",
@@ -366,24 +377,17 @@ export function Schedules({ branch }: { branch: Record<string, any> }) {
         onClose={() => setOpenedModalId(null)}
         mutation={async () => {
           if (!openedModalId) return;
-
           const markdown = serializeMarkdown(activeBlocks);
-
-          // Simpan ke server atau state global
           setMaterial({ id: openedModalId, material: markdown });
-
-          // Simpan blok builder-nya ke state lokal
           setBuilderState((prev) => ({
             ...prev,
             [openedModalId]: activeBlocks,
           }));
-
           setOpenedModalId(null);
         }}
       >
         <MDBuilder blocks={activeBlocks} setBlocks={setActiveBlocks} />
       </MDEditor>
-
       {showForm && (
         <form
           onSubmit={(e) => {

@@ -118,6 +118,11 @@ export function useSetMaterial() {
         `/Schedules/${data.id}/setMaterial`,
         {
           material: data.material,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
         }
       );
       return response.data;

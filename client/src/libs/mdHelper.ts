@@ -18,6 +18,7 @@ export function serializeMarkdown(blocks: Block[]): string {
     })
     .join("\n\n");
 }
+
 export function parseMarkdown(markdown: string): Block[] {
   const lines = markdown.split("\n");
   const blocks: Block[] = [];

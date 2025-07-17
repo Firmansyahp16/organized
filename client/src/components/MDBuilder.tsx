@@ -1,14 +1,17 @@
 import { uniqueId } from "lodash";
-import ReactMarkdown from "react-markdown";
-import { Block, serializeMarkdown } from "../libs/mdHelper";
+import { marked } from "marked";
+import { useEffect } from "react";
+import { Block, parseMarkdown, serializeMarkdown } from "../libs/mdHelper";
 import Card from "./Card";
 
 export function MDBuilder({
   blocks,
   setBlocks,
+  defaultMarkdown,
 }: {
   blocks: Block[];
   setBlocks: React.Dispatch<React.SetStateAction<Block[]>>;
+  defaultMarkdown?: string;
 }) {
   function updateBlock(index: number, updated: Block) {
     const clone = [...blocks];
@@ -32,6 +35,13 @@ export function MDBuilder({
 
     setBlocks((prev: Block[]) => [...prev, newBlock]);
   }
+
+  useEffect(() => {
+    if (defaultMarkdown && blocks.length === 0) {
+      const parsed = parseMarkdown(defaultMarkdown);
+      setBlocks(parsed);
+    }
+  }, [defaultMarkdown, setBlocks]);
 
   return (
     <Card expanded>
@@ -157,9 +167,13 @@ export function MDBuilder({
             </div>
           ))}
         </div>
-        <div className="overflow-y-auto p-2 border prose max-w-full">
-          <ReactMarkdown>{serializeMarkdown(blocks)}</ReactMarkdown>
-        </div>
+        <article className="prose max-w-full border overflow-y-auto p-2">
+          <div
+            dangerouslySetInnerHTML={{
+              __html: marked(serializeMarkdown(blocks)),
+            }}
+          />
+        </article>
       </div>
     </Card>
   );
