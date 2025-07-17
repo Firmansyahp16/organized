@@ -24,7 +24,7 @@ import {
   requestBody,
   response,
 } from '@loopback/rest';
-import {SecurityBindings, UserProfile} from '@loopback/security';
+import {SecurityBindings} from '@loopback/security';
 import {Users} from '../models';
 import {
   AttendancesRepository,
@@ -34,9 +34,9 @@ import {
   SchedulesRepository,
   UsersRepository,
 } from '../repositories';
+import {AuthorizationService} from '../services/authorization.service';
 import {MyUserProfile, MyUserService} from '../services/user.service';
 import {hashPassword} from '../utils/hash';
-import {AuthorizationService} from '../services/authorization.service';
 
 export class UsersController {
   constructor(
@@ -452,6 +452,4 @@ export class UsersController {
     }
     return dashboardData;
   }
-
-  // @authenticate('jwt')
 }

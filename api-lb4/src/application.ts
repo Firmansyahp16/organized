@@ -1,3 +1,4 @@
+import {faker} from '@faker-js/faker';
 import {
   AuthenticationComponent,
   registerAuthenticationStrategy,
@@ -18,12 +19,11 @@ import {ServiceMixin} from '@loopback/service-proxy';
 import {UserServiceBindings} from './keys';
 import {BranchRepository, UsersRepository} from './repositories';
 import {MySequence} from './sequence';
+import {AuthorizationService} from './services/authorization.service';
+import {JWTService} from './services/jwt.service';
 import {MyUserService} from './services/user.service';
 import {JWTStrategy} from './strategies/jwt.strategy';
 import {hashPassword} from './utils/hash';
-import {faker} from '@faker-js/faker';
-import {AuthorizationService} from './services/authorization.service';
-import {JWTService} from './services/jwt.service';
 import path = require('path');
 
 export {ApplicationConfig};
@@ -88,7 +88,7 @@ export class ApiApplication extends BootMixin(
         fullName: 'admin',
         hashedPassword: hashedPassword,
         globalRoles: ['admin'],
-        rank: 'd5',
+        rank: 'dan5',
       });
     } else {
       console.log('admin already exists');
