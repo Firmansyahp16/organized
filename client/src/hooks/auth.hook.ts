@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
-import { instance } from "../libs/axios";
 import { jwtDecode } from "jwt-decode";
 import { toast } from "react-toastify";
+import { instance } from "../libs/axios";
 
 export function useLogin() {
   return useMutation({
@@ -79,7 +79,7 @@ export function useRefresh() {
       toast.success("Refresh successful", {
         autoClose: 2000,
         onClose: () => {
-          window.location.href = "/";
+          window.location.reload();
         },
       });
     },
