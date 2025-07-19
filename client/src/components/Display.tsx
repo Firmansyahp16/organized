@@ -3,14 +3,21 @@ type Props = {
   value: string | number | boolean | null;
   isDate?: boolean;
   isCurrency?: boolean;
+  capitalize?: boolean;
 };
 
-export default function Display({ label, value, isDate, isCurrency }: Props) {
+export default function Display({
+  label,
+  value,
+  isDate,
+  isCurrency,
+  capitalize,
+}: Props) {
   return (
     <div className="flex flex-col">
       <span className="font-bold">{label}</span>
       {isDate ? (
-        <span>
+        <span className={capitalize ? "capitalize" : ""}>
           {`${new Intl.DateTimeFormat("id-ID", {
             dateStyle: "medium",
             timeStyle: "short",
@@ -21,14 +28,14 @@ export default function Display({ label, value, isDate, isCurrency }: Props) {
           )}`}
         </span>
       ) : isCurrency ? (
-        <span>
+        <span className={capitalize ? "capitalize" : ""}>
           {new Intl.NumberFormat("id-ID", {
             style: "currency",
             currency: "IDR",
           }).format(Number(value))}
         </span>
       ) : (
-        <span>{value}</span>
+        <span className={capitalize ? "capitalize" : ""}>{value}</span>
       )}
     </div>
   );
