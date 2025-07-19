@@ -5,9 +5,9 @@ import {
   repository,
 } from '@loopback/repository';
 import {MongoDataSource} from '../datasources';
-import {Attendances, AttendancesRelations, Schedules, Events} from '../models';
-import {SchedulesRepository} from './schedules.repository';
+import {Attendances, AttendancesRelations, Events, Schedules} from '../models';
 import {EventsRepository} from './events.repository';
+import {SchedulesRepository} from './schedules.repository';
 
 export class AttendancesRepository extends DefaultCrudRepository<
   Attendances,
@@ -19,15 +19,23 @@ export class AttendancesRepository extends DefaultCrudRepository<
     typeof Attendances.prototype.id
   >;
 
-  public readonly events: BelongsToAccessor<Events, typeof Attendances.prototype.id>;
+  public readonly events: BelongsToAccessor<
+    Events,
+    typeof Attendances.prototype.id
+  >;
 
   constructor(
     @inject('datasources.mongo') dataSource: MongoDataSource,
     @repository.getter('SchedulesRepository')
-    protected schedulesRepositoryGetter: Getter<SchedulesRepository>, @repository.getter('EventsRepository') protected eventsRepositoryGetter: Getter<EventsRepository>,
+    protected schedulesRepositoryGetter: Getter<SchedulesRepository>,
+    @repository.getter('EventsRepository')
+    protected eventsRepositoryGetter: Getter<EventsRepository>,
   ) {
     super(Attendances, dataSource);
-    this.events = this.createBelongsToAccessorFor('events', eventsRepositoryGetter,);
+    this.events = this.createBelongsToAccessorFor(
+      'events',
+      eventsRepositoryGetter,
+    );
     this.registerInclusionResolver('events', this.events.inclusionResolver);
     this.schedules = this.createBelongsToAccessorFor(
       'schedules',
@@ -45,7 +53,7 @@ export class AttendancesRepository extends DefaultCrudRepository<
         if (!ctx.instance.id) {
           ctx.instance.id = `ATT-${ctx.instance.schedulesId}`;
           ctx.instance.createdAt = new Date();
-          console.log(
+          console.info(
             'New Attendance: ',
             ctx.instance.id,
             'Created At: ',
@@ -54,9 +62,9 @@ export class AttendancesRepository extends DefaultCrudRepository<
         }
       } else if (ctx.data) {
         ctx.data.updatedAt = new Date();
-        console.log(
+        console.info(
           'Updated Attendance: ',
-          ctx.data.id,
+          ctx.where.id,
           'Updated At: ',
           ctx.data.updatedAt,
         );

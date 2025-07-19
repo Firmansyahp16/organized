@@ -1,15 +1,15 @@
-import {inject, Getter} from '@loopback/core';
+import {Getter, inject} from '@loopback/core';
 import {
-  DefaultCrudRepository,
-  repository,
   BelongsToAccessor,
-  Model, HasOneRepositoryFactory} from '@loopback/repository';
-import {MongoDataSource} from '../datasources';
-import {Events, EventsRelations, Users, Attendances} from '../models';
-import {UsersRepository} from './users.repository';
-import {PersistedModel} from 'loopback-datasource-juggler';
+  DefaultCrudRepository,
+  HasOneRepositoryFactory,
+  repository,
+} from '@loopback/repository';
 import {customAlphabet} from 'nanoid';
+import {MongoDataSource} from '../datasources';
+import {Attendances, Events, EventsRelations, Users} from '../models';
 import {AttendancesRepository} from './attendances.repository';
+import {UsersRepository} from './users.repository';
 
 export class EventsRepository extends DefaultCrudRepository<
   Events,
@@ -21,16 +21,27 @@ export class EventsRepository extends DefaultCrudRepository<
     typeof Events.prototype.id
   >;
 
-  public readonly attendances: HasOneRepositoryFactory<Attendances, typeof Events.prototype.id>;
+  public readonly attendances: HasOneRepositoryFactory<
+    Attendances,
+    typeof Events.prototype.id
+  >;
 
   constructor(
     @inject('datasources.mongo') dataSource: MongoDataSource,
     @repository.getter('UsersRepository')
-    protected usersRepositoryGetter: Getter<UsersRepository>, @repository.getter('AttendancesRepository') protected attendancesRepositoryGetter: Getter<AttendancesRepository>,
+    protected usersRepositoryGetter: Getter<UsersRepository>,
+    @repository.getter('AttendancesRepository')
+    protected attendancesRepositoryGetter: Getter<AttendancesRepository>,
   ) {
     super(Events, dataSource);
-    this.attendances = this.createHasOneRepositoryFactoryFor('attendances', attendancesRepositoryGetter);
-    this.registerInclusionResolver('attendances', this.attendances.inclusionResolver);
+    this.attendances = this.createHasOneRepositoryFactoryFor(
+      'attendances',
+      attendancesRepositoryGetter,
+    );
+    this.registerInclusionResolver(
+      'attendances',
+      this.attendances.inclusionResolver,
+    );
     this.createdBy = this.createBelongsToAccessorFor(
       'createdBy',
       usersRepositoryGetter,
@@ -59,7 +70,7 @@ export class EventsRepository extends DefaultCrudRepository<
         ctx.data.updatedAt = new Date();
         console.log(
           'Updated Event: ',
-          ctx.data.id,
+          ctx.where.id,
           'Updated At: ',
           ctx.data.updatedAt,
         );

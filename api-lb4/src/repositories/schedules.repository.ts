@@ -1,23 +1,21 @@
-import {inject, Getter} from '@loopback/core';
+import {Getter, inject} from '@loopback/core';
 import {
-  DefaultCrudRepository,
-  repository,
   BelongsToAccessor,
-  DataObject,
-  Options,
+  DefaultCrudRepository,
   HasOneRepositoryFactory,
+  repository,
 } from '@loopback/repository';
 import {MongoDataSource} from '../datasources';
 import {
+  Attendances,
+  Branch,
   Schedules,
   SchedulesRelations,
-  Branch,
   Users,
-  Attendances,
 } from '../models';
+import {AttendancesRepository} from './attendances.repository';
 import {BranchRepository} from './branch.repository';
 import {UsersRepository} from './users.repository';
-import {AttendancesRepository} from './attendances.repository';
 
 export class SchedulesRepository extends DefaultCrudRepository<
   Schedules,
@@ -89,7 +87,7 @@ export class SchedulesRepository extends DefaultCrudRepository<
         ctx.data.updatedAt = new Date();
         console.log(
           'Updated Schedule: ',
-          ctx.data.id,
+          ctx.where.id,
           'Updated At: ',
           ctx.data.updatedAt,
         );

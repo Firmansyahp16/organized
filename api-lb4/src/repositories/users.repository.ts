@@ -1,16 +1,8 @@
-import {Getter, inject} from '@loopback/core';
-import {
-  BelongsToAccessor,
-  DataObject,
-  DefaultCrudRepository,
-  Model,
-  Options,
-  repository,
-} from '@loopback/repository';
+import {inject} from '@loopback/core';
+import {DefaultCrudRepository} from '@loopback/repository';
+import {customAlphabet} from 'nanoid';
 import {MongoDataSource} from '../datasources';
-import {Branch, Users, UsersRelations} from '../models';
-import {BranchRepository} from './branch.repository';
-import {customAlphabet, nanoid} from 'nanoid';
+import {Users, UsersRelations} from '../models';
 
 export type Credentials = {
   email: string;
@@ -43,7 +35,7 @@ export class UsersRepository extends DefaultCrudRepository<
         ctx.data.updatedAt = new Date();
         console.log(
           'Updated User: ',
-          ctx.data.id,
+          ctx.where.id,
           'Updated At: ',
           ctx.data.updatedAt,
         );

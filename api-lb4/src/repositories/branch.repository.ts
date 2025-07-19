@@ -72,12 +72,22 @@ export class BranchRepository extends DefaultCrudRepository<
         ctx.data.updatedAt = new Date();
         console.log(
           'Updated Branch: ',
-          ctx.data.id,
+          ctx.where.id,
           'Updated At: ',
           ctx.data.updatedAt,
         );
       }
     });
     return modelClass;
+  }
+  async findMembers(id: string) {
+    const branch = await this.findById(id);
+    const members = (await (await this.usersRepositoryGetter()).find()).filter(
+      u =>
+        u.branchRoles?.some(
+          br => br.branchId === branch.id && br.roles?.includes('member'),
+        ),
+    );
+    return members;
   }
 }

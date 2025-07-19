@@ -1,16 +1,14 @@
-import {inject, Getter} from '@loopback/core';
+import {Getter, inject} from '@loopback/core';
 import {
+  BelongsToAccessor,
   DefaultCrudRepository,
   repository,
-  BelongsToAccessor,
-  Model,
 } from '@loopback/repository';
-import {MongoDataSource} from '../datasources';
-import {Examinations, ExaminationsRelations, Users, Branch} from '../models';
-import {UsersRepository} from './users.repository';
-import {PersistedModel} from 'loopback-datasource-juggler';
 import {customAlphabet} from 'nanoid';
+import {MongoDataSource} from '../datasources';
+import {Branch, Examinations, ExaminationsRelations, Users} from '../models';
 import {BranchRepository} from './branch.repository';
+import {UsersRepository} from './users.repository';
 
 export class ExaminationsRepository extends DefaultCrudRepository<
   Examinations,
@@ -68,7 +66,7 @@ export class ExaminationsRepository extends DefaultCrudRepository<
         ctx.data.updatedAt = new Date();
         console.log(
           'Updated Examination: ',
-          ctx.data.id,
+          ctx.where.id,
           'Updated At: ',
           ctx.data.updatedAt,
         );
