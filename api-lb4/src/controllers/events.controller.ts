@@ -1,3 +1,5 @@
+import {authenticate} from '@loopback/authentication';
+import {inject} from '@loopback/core';
 import {
   Count,
   CountSchema,
@@ -7,27 +9,25 @@ import {
   Where,
 } from '@loopback/repository';
 import {
-  post,
-  param,
+  del,
   get,
   getModelSchemaRef,
+  HttpErrors,
+  param,
   patch,
-  put,
-  del,
+  post,
   requestBody,
   response,
-  HttpErrors,
 } from '@loopback/rest';
+import {SecurityBindings} from '@loopback/security';
 import {Events} from '../models';
 import {
+  BranchRepository,
   EventsRepository,
   ExaminationsRepository,
   SchedulesRepository,
 } from '../repositories';
-import {inject} from '@loopback/core';
 import {MyUserProfile} from '../services/user.service';
-import {SecurityBindings} from '@loopback/security';
-import {authenticate} from '@loopback/authentication';
 
 export class EventsController {
   constructor(
@@ -37,6 +37,8 @@ export class EventsController {
     public examinationsRepository: ExaminationsRepository,
     @repository(SchedulesRepository)
     public schedulesRepository: SchedulesRepository,
+    @repository(BranchRepository)
+    public branchRepository: BranchRepository,
     @inject(SecurityBindings.USER, {optional: true})
     public user: MyUserProfile,
   ) {}
@@ -154,6 +156,41 @@ export class EventsController {
   })
   async deleteById(@param.path.string('id') id: string): Promise<void> {
     await this.eventsRepository.deleteById(id);
+  }
+
+  @authenticate('jwt')
+  @get('/Events/{id}/branchParticipated')
+  @response(200, {
+    description: 'Events model instance',
+  })
+  async branchParticipated(@param.path.string('id') id: string) {
+    const result: {
+      [branchId: string]: {
+        id: string;
+        name: string;
+        rank: string;
+      }[];
+    } = {};
+    const event = await this.eventsRepository.findById(id);
+    if (!event) {
+      throw new HttpErrors.NotFound('Event not found');
+    }
+    for (const branchId of event?.branchIds || []) {
+      const branch = await this.branchRepository.findById(branchId);
+      if (!branch) {
+        throw new HttpErrors.NotFound('Branch not found');
+      }
+      const member = await this.branchRepository.findMembers(branchId);
+      if (!member) {
+        throw new HttpErrors.NotFound('Member not found');
+      }
+      result[branchId] = member.map(m => ({
+        id: String(m.id),
+        name: String(m.fullName),
+        rank: String(m.rank),
+      }));
+    }
+    return result;
   }
 
   @authenticate('jwt')
