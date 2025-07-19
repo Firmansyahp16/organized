@@ -1,8 +1,8 @@
 import { Link } from "@tanstack/react-router";
+import { useEffect, useRef, useState } from "react";
 import { useLogout } from "../hooks/auth.hook";
-import { useRef, useState, useEffect } from "react";
-import { SessionCountdown } from "./ExpiredAt";
 import { DraggableButton } from "./DraggableMenu";
+import { SessionCountdown } from "./ExpiredAt";
 
 type Props = {
   children: React.ReactNode;
@@ -60,7 +60,7 @@ export default function AppLayout({ children }: Props) {
                 </div>
 
                 {/* Daftar menu */}
-                <div className="border-t border-base-300 mt-4" />
+                <div className="border-t border-black mt-4" />
                 <ul className="flex flex-col gap-2 mt-2">
                   <li>
                     <Link to="/">Dashboard</Link>
