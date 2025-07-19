@@ -1,15 +1,15 @@
 import { useForm } from "@tanstack/react-form";
-import Header from "../../components/Header";
-import AppLayout from "../../components/Layout";
-import { isAuthenticated } from "../../libs/authenticated";
 import { redirect } from "@tanstack/react-router";
-import { useCreateEvent, useGetBranchOptions } from "../../hooks/event.hook";
+import { createColumnHelper } from "@tanstack/react-table";
+import { useState } from "react";
 import Card from "../../components/Card";
 import InputField from "../../components/Field/InputField";
 import OptionField from "../../components/Field/OptionField";
-import { useEffect, useState } from "react";
-import { createColumnHelper } from "@tanstack/react-table";
+import Header from "../../components/Header";
+import AppLayout from "../../components/Layout";
 import { Table } from "../../components/Table";
+import { useCreateEvent, useGetBranchOptions } from "../../hooks/event.hook";
+import { isAuthenticated } from "../../libs/authenticated";
 
 export const Route = createFileRoute({
   component: RouteComponent,
@@ -97,14 +97,11 @@ function BranchModal({
 function RouteComponent() {
   const { mutate: createEvent } = useCreateEvent();
   const [branchIds, setBranchIds] = useState<string[]>([]);
-  useEffect(() => {
-    console.log(branchIds);
-  }, [branchIds]);
   const eventForm = useForm({
     onSubmit({ value }: Record<string, any>) {
-      // createEvent(value);
       value.branchIds = branchIds;
-      console.log(value);
+      value.date = new Date(value.date).toISOString();
+      createEvent(value);
     },
   });
   return (
@@ -118,57 +115,67 @@ function RouteComponent() {
             eventForm.handleSubmit();
           }}
         >
-          <div className="grid grid-cols-2 gap-5">
-            <InputField form={eventForm} name="title" label="Title" required />
-            <InputField
-              form={eventForm}
-              name="description"
-              label="Description"
-              type="textarea"
-              required
-            />
-            <InputField
-              form={eventForm}
-              name="date"
-              label="Date"
-              type="datetime-local"
-              required
-            />
-            <div className="grid grid-cols-1 gap-1">
-              <BranchModal branchIds={branchIds} setBranchIds={setBranchIds} />
-              <p className="label">Branches</p>
-              <button
-                className="btn btn-primary w-fit"
-                onClick={() => {
-                  (
-                    document.getElementById("branch-modal") as HTMLDialogElement
-                  ).showModal();
-                }}
-              >
-                Set Branches
+          <div className="grid gap-2">
+            <div className="grid grid-cols-2 gap-5">
+              <InputField
+                form={eventForm}
+                name="title"
+                label="Title"
+                required
+              />
+              <InputField
+                form={eventForm}
+                name="description"
+                label="Description"
+                type="textarea"
+                required
+              />
+              <InputField
+                form={eventForm}
+                name="date"
+                label="Date"
+                type="datetime-local"
+                required
+              />
+              <div className="grid grid-cols-1 gap-1">
+                <BranchModal
+                  branchIds={branchIds}
+                  setBranchIds={setBranchIds}
+                />
+                <p className="label">Branches</p>
+                <button
+                  className="btn btn-primary w-fit"
+                  type="button"
+                  onClick={() => {
+                    (
+                      document.getElementById(
+                        "branch-modal"
+                      ) as HTMLDialogElement
+                    ).showModal();
+                  }}
+                >
+                  Set Branches
+                </button>
+              </div>
+              <OptionField
+                form={eventForm}
+                name="type"
+                label="Type"
+                options={[
+                  { label: "Schedules", value: "schedules" },
+                  { label: "Examinations", value: "examination" },
+                ]}
+                defaultValue="schedules"
+                required
+              />
+            </div>
+            <div className="card-action">
+              <button type="submit" className="join-item btn btn-primary">
+                Create
               </button>
             </div>
-            <OptionField
-              form={eventForm}
-              name="type"
-              label="Type"
-              options={[
-                { label: "Schedules", value: "schedules" },
-                { label: "Examinations", value: "examination" },
-              ]}
-              required
-            />
           </div>
         </form>
-        <div className="card-action">
-          <button
-            type="submit"
-            className="join-item btn btn-primary"
-            form="event-form"
-          >
-            Create
-          </button>
-        </div>
       </Card>
     </AppLayout>
   );
