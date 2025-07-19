@@ -1,6 +1,6 @@
-import {Entity, model, property, belongsTo, hasOne} from '@loopback/repository';
-import {Users} from './users.model';
+import {belongsTo, Entity, hasOne, model, property} from '@loopback/repository';
 import {Attendances} from './attendances.model';
+import {Users} from './users.model';
 
 @model()
 export class Events extends Entity {
@@ -27,9 +27,7 @@ export class Events extends Entity {
   })
   type: string;
 
-  @property.array(String, {
-    type: 'string',
-  })
+  @property.array('string')
   branchIds?: string[];
 
   @property.array(Object, {
@@ -40,9 +38,7 @@ export class Events extends Entity {
     rank: string;
   }[];
 
-  @property.array(String, {
-    type: 'string',
-  })
+  @property.array('string')
   examiners?: string[];
 
   @property({
