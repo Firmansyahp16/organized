@@ -74,6 +74,7 @@ export class ApiApplication extends BootMixin(
   async start() {
     // @ts-ignore
     await super.start();
+    console.log('Initializing Data');
     const usersRepository = await this.getRepository(UsersRepository);
     const branchRepository = await this.getRepository(BranchRepository);
     const users = await usersRepository.find();
@@ -99,6 +100,10 @@ export class ApiApplication extends BootMixin(
         name: 'Main Branch',
         coachIds: [],
       });
+      const second = await branchRepository.create({
+        name: 'Second Branch',
+        coachIds: [],
+      });
       const coach = await usersRepository.create({
         email: 'coach@mail.com',
         fullName: 'coach',
@@ -107,8 +112,19 @@ export class ApiApplication extends BootMixin(
         branchRoles: [{branchId: branch.id, roles: ['coach']}],
         rank: 'dan5',
       });
+      const secondCoach = await usersRepository.create({
+        email: 'secondCoach@mail.com',
+        fullName: 'secondCoach',
+        hashedPassword: await hashPassword('Coach123', 10),
+        globalRoles: ['examiners'],
+        branchRoles: [{branchId: second.id, roles: ['coach']}],
+        rank: 'dan5',
+      });
       await branchRepository.updateById(branch.id, {
         coachIds: [coach.id],
+      });
+      await branchRepository.updateById(second.id, {
+        coachIds: [secondCoach.id],
       });
       for (let i = 0; i < 10; i++) {
         const hashedPassword = await hashPassword(
@@ -123,6 +139,22 @@ export class ApiApplication extends BootMixin(
           fullName: faker.person.fullName(),
           hashedPassword: hashedPassword,
           branchRoles: [{branchId: branch.id, roles: ['member']}],
+          rank: 'kyu8',
+        });
+      }
+      for (let i = 0; i < 10; i++) {
+        const hashedPassword = await hashPassword(
+          faker.internet.password({
+            length: 6,
+            pattern: /^[A-Za-z0-9]+$/,
+          }),
+          10,
+        );
+        await usersRepository.create({
+          email: faker.internet.email(),
+          fullName: faker.person.fullName(),
+          hashedPassword: hashedPassword,
+          branchRoles: [{branchId: second.id, roles: ['member']}],
           rank: 'kyu8',
         });
       }
@@ -141,5 +173,6 @@ export class ApiApplication extends BootMixin(
         });
       }
     }
+    console.log('Data initialized');
   }
 }
