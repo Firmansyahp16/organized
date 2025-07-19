@@ -1,8 +1,8 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { PaginationState } from "@tanstack/react-table";
-import { instance } from "../libs/axios";
 import { useNavigate } from "@tanstack/react-router";
+import { PaginationState } from "@tanstack/react-table";
 import { toast } from "react-toastify";
+import { instance } from "../libs/axios";
 
 export function useGetAllEvents(pagination: PaginationState, filter?: any) {
   return useQuery({
@@ -60,6 +60,30 @@ export function useGetBranchOptions() {
         id: branch.id,
         name: branch.name,
       }));
+    },
+  });
+}
+
+export function useDeleteEvent() {
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const response = await instance.delete(`/Events/${id}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+      return response.data;
+    },
+    onSuccess() {
+      toast.success("Event deleted successfully", {
+        autoClose: 2000,
+        onClose: () => {
+          window.location.reload();
+        },
+      });
+    },
+    onError(error) {
+      toast.error(error.message);
     },
   });
 }
