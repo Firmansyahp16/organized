@@ -1,18 +1,18 @@
 import { Link, redirect } from "@tanstack/react-router";
-import { isAuthenticated } from "../../libs/authenticated";
-import AppLayout from "../../components/Layout";
-import Header from "../../components/Header";
-import Card from "../../components/Card";
-import { useGetCalendar } from "../../hooks/calendar.hook";
-import { useEffect, useMemo, useState } from "react";
-import { Calendar, dateFnsLocalizer, ToolbarProps } from "react-big-calendar";
 import { format } from "date-fns/format";
-import { parse } from "date-fns/parse";
-import { startOfWeek } from "date-fns/startOfWeek";
 import { getDay } from "date-fns/getDay";
 import { id } from "date-fns/locale/id";
+import { parse } from "date-fns/parse";
+import { startOfWeek } from "date-fns/startOfWeek";
+import { useMemo, useState } from "react";
+import { Calendar, dateFnsLocalizer, ToolbarProps } from "react-big-calendar";
 import "react-big-calendar/lib/css/react-big-calendar.css";
+import Card from "../../components/Card";
 import Display from "../../components/Display";
+import Header from "../../components/Header";
+import AppLayout from "../../components/Layout";
+import { useGetCalendar } from "../../hooks/calendar.hook";
+import { isAuthenticated } from "../../libs/authenticated";
 
 export const Route = createFileRoute({
   component: RouteComponent,
@@ -128,7 +128,7 @@ function RouteComponent() {
       end: new Date(schedule.date),
       allDay: true,
       branches: schedule.branches,
-      type: "schedule",
+      type: "schedules",
     }));
     const examinations = calendarData?.examinations.map((examination: any) => ({
       id: examination.id,
@@ -137,7 +137,7 @@ function RouteComponent() {
       end: new Date(examination.date),
       allDay: true,
       branches: examination.branches,
-      type: "examination",
+      type: "examinations",
     }));
     const events = calendarData?.events.map((event: any) => ({
       id: event.id,
@@ -146,7 +146,12 @@ function RouteComponent() {
       end: new Date(event.date),
       allDay: true,
       branches: event.branches,
-      type: "event",
+      type:
+        event.type === "schedules"
+          ? "schedule"
+          : event.type === "examinations"
+          ? "examination"
+          : "events",
     }));
     return [...(schedules || []), ...(examinations || []), ...(events || [])];
   }, [calendarData]);
@@ -170,15 +175,16 @@ function RouteComponent() {
           style={{ height: 800 }}
           eventPropGetter={(event) => {
             let bgColor = "var(--color-base-200)";
+            console.log(event);
             switch (event.type) {
-              case "schedule":
+              case "schedules":
                 bgColor = "var(--color-primary)";
                 break;
-              case "examination":
-                bgColor = "var(--color-accent)";
+              case "examinations":
+                bgColor = "var(--color-error)";
                 break;
               case "events":
-                bgColor = "var(--color-warning)";
+                bgColor = "var(--color-accent)";
                 break;
             }
             return {
@@ -206,10 +212,10 @@ function RouteComponent() {
                       `modal-${event.id}`
                     ) as HTMLDialogElement;
                     dialog?.showModal();
-                  }, 0); // Tunggu 1 cycle supaya modal dirender dulu
+                  }, 0);
                 }}
               >
-                {event.title}
+                {event.id}
               </div>
             ),
           }}
