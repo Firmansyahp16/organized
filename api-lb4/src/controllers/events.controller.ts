@@ -264,7 +264,7 @@ export class EventsController {
       throw new HttpErrors.NotFound('Event not found');
     }
 
-    if (event.type !== 'exam') {
+    if (event.type !== 'examinations') {
       throw new HttpErrors.BadRequest('Event type must be "exam"');
     }
 
@@ -310,8 +310,8 @@ export class EventsController {
     if (!event) {
       throw new HttpErrors.NotFound('Event not found');
     }
-    if (event.type !== 'schedule') {
-      throw new HttpErrors.BadRequest('Event type must be "schedule"');
+    if (event.type !== 'schedules') {
+      throw new HttpErrors.BadRequest('Event type must be "schedules"');
     }
     try {
       const attendanceData = requestBody;
