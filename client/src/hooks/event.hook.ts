@@ -87,3 +87,97 @@ export function useDeleteEvent() {
     },
   });
 }
+
+export function useGetEventById(id: string) {
+  return useQuery({
+    queryKey: ["event", id],
+    queryFn: async () => {
+      const response = await instance.get(`/Events/${id}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        params: {
+          filter: {
+            include: ["attendances"],
+          },
+        },
+      });
+      return response.data;
+    },
+  });
+}
+
+export function useGetBranchParticipated(id: string) {
+  return useQuery({
+    queryKey: ["branchParticipated", id],
+    queryFn: async () => {
+      const response = await instance.get(`/Events/${id}/branchParticipated`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+      return response.data;
+    },
+  });
+}
+
+export function useSetParticipant(id: string) {
+  return useMutation({
+    mutationFn: async (data: {
+      participants: {
+        id: string;
+        rank: string;
+      }[];
+    }) => {
+      const response = await instance.post(
+        `/Events/${id}/setParticipants`,
+        data,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      return response.data;
+    },
+    onSuccess() {
+      toast.success("Participant set successfully", {
+        autoClose: 2000,
+        onClose: () => {
+          window.location.reload();
+        },
+      });
+    },
+    onError(error) {
+      toast.error(error.message);
+    },
+  });
+}
+
+export function useSetAttendance(id: string) {
+  return useMutation({
+    mutationFn: async (data: { id: string; status: string }[]) => {
+      const response = await instance.post(
+        `/Events/${id}/setAttendance`,
+        data,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      return response.data;
+    },
+    onSuccess() {
+      toast.success("Attendances set successfully", {
+        autoClose: 2000,
+        onClose: () => {
+          window.location.reload();
+        },
+      });
+    },
+    onError(error) {
+      toast.error(error.message);
+    },
+  });
+}
