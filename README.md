@@ -33,57 +33,60 @@ Terdapat beberapa kategori fitur yang dibangun pada Organized, antara lain sebag
     2. branchRoles
        branchRoles adalah role pengguna di tiap cabang, dapat terdiri atas "member", "branchManager", "branchSupport","examiners", dan "coach".
 - Manajemen Anggota
-  1. Pengguna dapat mendaftarkan diri melalui web
-  2. Pengguna mendapatkan globalRoles "unAssociated" dimana pengguna belum terdaftar sebagai apapun di cabang mana pun.
-  3. Pengguna dapat melihat terlebih dahulu profil dari cabang untuk menjadi pertimbangan memilih mendaftar ke cabang mana.
-  4. Pelatih ("coach" di cabang) dapat ditentukan oleh Admin pusat ("admin" di global) atau Manager Cabang ("coachManager" di cabang).
+  - Pengguna dapat mendaftarkan diri melalui web
+  - Pengguna mendapatkan globalRoles "unAssociated" dimana pengguna belum terdaftar sebagai apapun di cabang mana pun.
+  - Pengguna dapat melihat terlebih dahulu profil dari cabang untuk menjadi pertimbangan memilih mendaftar ke cabang mana.
+  - Pelatih ("coach" di cabang) dapat ditentukan oleh Admin pusat ("admin" di global) atau Manager Cabang ("coachManager" di cabang).
 - Latihan dan Kehadiran
-  1. Pelatih ("coach" di cabang) dapat membuat jadwal latihan pada hari dan jam yang ditentukan.
-  2. Pelatih dapat menambahkan materi yang akan dijadikan bahan latihan pada jadwal mendatang dan dapat dilihat oleh Anggota ("member" di cabang).
-  3. Pelatih dapat membuat kehadiran atau presensi peserta.
+  - Pelatih ("coach" di cabang) dapat membuat jadwal latihan pada hari dan jam yang ditentukan.
+  - Pelatih dapat menambahkan materi yang akan dijadikan bahan latihan pada jadwal mendatang dan dapat dilihat oleh Anggota ("member" di cabang).
+  - Pelatih dapat membuat kehadiran atau presensi peserta.
 - Ujian Kenaikan Tingkat
 
-  1. Ujian kenaikan dibuat oleh Pelatih ("coach" di cabang) dan dapat mengatur Penguji ("examiners" di cabang).
-  2. Pelatih dapat mengatur peserta ujian dengan dua opsi, otomatis (dihitung 80% + 4 kehadiran) dan manual.
-  3. Penilaian hanya dapat diberikan oleh Penguji dengan kriteria berikut.
-     |Kategori|Rentang Nilai|
-     |-------|-------|
-     |Kihon|A, B, C|
-     |Kata|A, B, C|
-     |Kumite|A, B, C|
-  4. Hasil akhir ujian ditentukan secara otomatis berdasarkan nilai dengan ketentuan berikut.
-     a. Hasilnya adalah "special" atau naik dua tingkat jika semua kategori (kihon, kata, dan kumite) bernilai "A".
-     b. Hasilnya adalah "pass" atau naik tingkat jika kombinasi nilai kategori tidak cocok dengan kombinasi berikut. Kombinasi tersebut merupakan kombinasi untuk hasil "fail".
+  - Ujian kenaikan dibuat oleh Pelatih ("coach" di cabang) dan dapat mengatur Penguji ("examiners" di cabang).
+  - Pelatih dapat mengatur peserta ujian dengan dua opsi, otomatis (dihitung 80% + 4 kehadiran) dan manual.
+  - Penilaian hanya dapat diberikan oleh Penguji dengan kriteria berikut.
+    |Kategori|Rentang Nilai|
+    |-------|-------|
+    |Kihon|A, B, C|
+    |Kata|A, B, C|
+    |Kumite|A, B, C|
+  - Hasil akhir ujian ditentukan secara otomatis berdasarkan nilai dengan ketentuan berikut.
 
-     | Kihon | Kata | Kumite |
-     | ----- | ---- | ------ |
-     | A     | C    | C      |
-     | B     | C    | C      |
-     | C     | A    | A      |
-     | C     | A    | B      |
-     | C     | A    | C      |
-     | C     | B    | A      |
-     | C     | B    | B      |
-     | C     | B    | C      |
-     | C     | C    | A      |
-     | C     | C    | B      |
-     | C     | C    | C      |
+    - Hasilnya adalah "special" atau naik dua tingkat jika semua kategori (kihon, kata, dan kumite) bernilai "A".
+    - Hasilnya adalah "pass" atau naik tingkat jika kombinasi nilai kategori tidak cocok dengan kombinasi berikut. Kombinasi tersebut merupakan kombinasi untuk hasil "fail".
+
+    | Kihon | Kata | Kumite |
+    | ----- | ---- | ------ |
+    | A     | C    | C      |
+    | B     | C    | C      |
+    | C     | A    | A      |
+    | C     | A    | B      |
+    | C     | A    | C      |
+    | C     | B    | A      |
+    | C     | B    | B      |
+    | C     | B    | C      |
+    | C     | C    | A      |
+    | C     | C    | B      |
+    | C     | C    | C      |
 
 - Kegiatan Pusat
+
   Kegiatan pusat dapat berupa Latihan Gabungan beberapa cabang, Ujian Gabungan, kegiatan outdoor, atau acara multi cabang lainnya.
+
 - Materi Latihan
-  1. Materi latihan dapat berupa text singkat yang diatur oleh Pelatih.
-  2. Dapat juga berupa video singkat atau foto referensi yang akan digunakan (SEGERA)
+  - Materi latihan dapat berupa text singkat yang diatur oleh Pelatih.
+  - Dapat juga berupa video singkat atau foto referensi yang akan digunakan (SEGERA)
 - Monitoring dan Laporan (SEGERA)
-  1. Admin pusat dapat melihat rincian berikut.
-     - Ringkasan jumlah anggota aktif, pelatih aktif, cabang dan rinciannya.
-     - Jadwal latihan hari ini
-     - Ujian yang akan datang
-  2. Pelatih, Manager Cabang, dan Pengurus Cabang juga dapat melihat rincian dari cabang mereka.
-  3. Format laporan berupa PDF/Excel
+  - Admin pusat dapat melihat rincian berikut.
+    - Ringkasan jumlah anggota aktif, pelatih aktif, cabang dan rinciannya.
+    - Jadwal latihan hari ini
+    - Ujian yang akan datang
+  - Pelatih, Manager Cabang, dan Pengurus Cabang juga dapat melihat rincian dari cabang mereka.
+  - Format laporan berupa PDF/Excel
 - KTA (SEGERA)
-  1. Sistem dapat membuat kartu anggota dengan QR/Barcode yang dapat digunakan untuk presensi atau pendaftaran kegiatan
-  2. Dapat dicetak dan digunakan oleh seluruh bagian dari Organized
+  - Sistem dapat membuat kartu anggota dengan QR/Barcode yang dapat digunakan untuk presensi atau pendaftaran kegiatan
+  - Dapat dicetak dan digunakan oleh seluruh bagian dari Organized
 - Keuangan (SEGERA)
-  1. Mencatat laporan keuangan keluar masuk untuk cabang yang dapat berupa kas, iuran, atau pembyaran.
-  2. Menyediakan grafik arus keuangan.
+  - Mencatat laporan keuangan keluar masuk untuk cabang yang dapat berupa kas, iuran, atau pembyaran.
+  - Menyediakan grafik arus keuangan.
