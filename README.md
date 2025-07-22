@@ -10,12 +10,12 @@ Organized dibangun dengan teknologi sebagai berikut.
 | Bagian | Teknologi |
 | ------ | ------ |
 | Database | MongoDB |
-| Backend | Loopback 4, Typescript (SEGERA MIGRASI KE NEST)|
+| Backend | NestJS, Typescript (SEGERA MIGRASI KE NEST), Prisma|
 | Frontend | React, Typescript, DaisyUI |
 
 ## Struktur
 
-- Folder api-lb4 adalah folder project API yang dibuat dengan LB4 cli
+- Folder api adalah folder project API yang dibuat dengan NestJS dan Prisma
 - Folder client adalah folder UI untuk dashboard admin
 - Folder mobile adalah folder UI untuk mobile apps (SEGERA)
 
