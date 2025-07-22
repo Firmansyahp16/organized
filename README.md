@@ -12,7 +12,7 @@ Organized dibangun dengan teknologi sebagai berikut.
 | Runtime | Node.js |
 | Package Manager | PNPM |
 | Database | MongoDB |
-| Backend | NestJS, Typescript (SEGERA MIGRASI KE NEST), Prisma |
+| Backend | NestJS, Typescript, Prisma |
 | Frontend | React, Typescript, DaisyUI |
 
 ## Struktur
