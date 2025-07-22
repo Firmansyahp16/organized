@@ -1,0 +1,136 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+type Roles {
+  branchId String
+  roles String[]
+}
+
+model Users {
+  id String @id @db.String @map("_id")
+  fullName String?
+  email String? @unique
+  hashedPassword String?
+  rank String?
+  globalRoles String[]
+  branchRoles Roles[]
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+}
+
+model Branch {
+  id String @id @db.String @map("_id")
+  name String?
+  coachIds String[]
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+
+  // Has many schedules
+  schedules Schedules[]
+
+  // Has many examinations
+  examinations Examinations[]
+}
+
+model Schedules {
+  id String @id @db.String @map("_id")
+  title String?
+  date DateTime?
+  material String?
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+
+  // Owned by 1 Branch
+  branchId String? @db.String
+  branch Branch? @relation(fields: [branchId], references: [id])
+
+  // Only have 1 Attendances
+  attendance Attendances?
+}
+
+enum StatusType {
+  present
+  absence
+}
+
+type Details {
+  id String
+  status StatusType
+}
+
+model Attendances {
+  id String @id @db.String @map("_id")
+  details Details[]
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+
+  // Owned by 1 Schedule
+  scheduleId String? @db.String @unique
+  schedule Schedules? @relation(fields: [scheduleId],references: [id])
+
+  // Owned by 1 Events
+  eventId String? @db.String @unique
+  event Events? @relation(fields: [eventId],references: [id])
+}
+
+type Participants {
+  id String
+  rank String
+}
+
+type Score {
+  kihon  String
+  kata   String
+  kumite String
+  result String?
+}
+
+model Examinations {
+  id String @id @db.String @map("_id")
+  title String?
+  date DateTime?
+  participants Participants[]
+  results Score? @map("results")
+  examiners String[]
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+
+  // Owned by 1 Branch
+  branchId String? @db.String
+  branch Branch? @relation(fields: [branchId],references: [id])
+}
+
+enum EventType {
+  schedules
+  examinations
+  events
+}
+
+model Events {
+  id String @id @db.String @map("_id")
+  title String?
+  description String?
+  date DateTime?
+  type EventType?
+  branchIds String[]
+  participants Participants[]
+  examiners String[]
+  results Score? @map("results")
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+
+  // Only have 1 Attendances
+  attendance Attendances?
+}
