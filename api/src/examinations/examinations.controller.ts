@@ -10,7 +10,7 @@ import {
   Post,
   UseGuards,
 } from "@nestjs/common";
-import { Examinations } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { JwtAuthGuard } from "../auth/auth.guard";
 import { MyUserProfile } from "../auth/auth.service";
 import { AuthorizationService } from "../authorization/authorization.service";
@@ -33,7 +33,7 @@ export class ExaminationsController {
 
   @UseGuards(JwtAuthGuard)
   @Post()
-  async create(@Body() data: Partial<Examinations>) {
+  async create(@Body() data: Prisma.ExaminationsCreateInput) {
     return await this.prismaService.examinations.create({
       data: {
         ...data,
@@ -60,7 +60,7 @@ export class ExaminationsController {
   @Patch(":id")
   async updateExamination(
     @Param("id") id: string,
-    @Body() data: Partial<Examinations>
+    @Body() data: Prisma.ExaminationsUpdateInput
   ) {
     return await this.prismaService.examinations.update({
       where: {

@@ -10,7 +10,7 @@ import {
   Post,
   UseGuards,
 } from "@nestjs/common";
-import { Users } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { JwtAuthGuard } from "../auth/auth.guard";
 import { MyUserProfile } from "../auth/auth.service";
 import { AuthorizationService } from "../authorization/authorization.service";
@@ -29,7 +29,7 @@ export class UsersController {
 
   @UseGuards(JwtAuthGuard)
   @Post()
-  async createUser(@Body() data: Partial<Users>) {
+  async createUser(@Body() data: Prisma.UsersCreateInput) {
     return await this.prismaService.users.create({
       data: {
         ...data,
@@ -61,7 +61,7 @@ export class UsersController {
   async updateUser(
     @Param("id") id: string,
     @Body()
-    data: Partial<Users>,
+    data: Prisma.UsersUpdateInput,
     @CurrentUser() currentUser: MyUserProfile
   ) {
     if (

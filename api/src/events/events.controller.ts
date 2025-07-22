@@ -10,7 +10,7 @@ import {
   Post,
   UseGuards,
 } from "@nestjs/common";
-import { Events } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { JwtAuthGuard } from "../auth/auth.guard";
 import { MyUserProfile } from "../auth/auth.service";
 import { AuthorizationService } from "../authorization/authorization.service";
@@ -33,7 +33,7 @@ export class EventsController {
 
   @UseGuards(JwtAuthGuard)
   @Post()
-  async createEvent(@Body() data: Partial<Events>) {
+  async createEvent(@Body() data: Prisma.EventsCreateInput) {
     return await this.prismaService.events.create({
       data: {
         ...data,
@@ -58,7 +58,10 @@ export class EventsController {
 
   @UseGuards(JwtAuthGuard)
   @Patch(":id")
-  async updateEvent(@Param("id") id: string, @Body() data: Partial<Events>) {
+  async updateEvent(
+    @Param("id") id: string,
+    @Body() data: Prisma.EventsUpdateInput
+  ) {
     return await this.prismaService.events.update({
       where: {
         id: id,

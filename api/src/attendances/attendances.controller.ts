@@ -8,7 +8,7 @@ import {
   Post,
   UseGuards,
 } from "@nestjs/common";
-import { Attendances } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { JwtAuthGuard } from "../auth/auth.guard";
 import { generateID } from "../libs/generateID";
 import { PrismaService } from "../prisma/prisma.service";
@@ -21,7 +21,7 @@ export class AttendancesController {
 
   @UseGuards(JwtAuthGuard)
   @Post()
-  async create(@Body() data: Partial<Attendances>) {
+  async create(@Body() data: Prisma.AttendancesCreateInput) {
     return await this.prismaService.attendances.create({
       data: {
         ...data,
@@ -50,7 +50,7 @@ export class AttendancesController {
   @Patch(":id")
   async updateAttendance(
     @Param("id") id: string,
-    @Body() data: Partial<Attendances>
+    @Body() data: Prisma.AttendancesUpdateInput
   ) {
     return await this.prismaService.attendances.update({
       where: {

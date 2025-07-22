@@ -10,7 +10,7 @@ import {
   Post,
   UseGuards,
 } from "@nestjs/common";
-import { Branch } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { JwtAuthGuard } from "../auth/auth.guard";
 import { MyUserProfile } from "../auth/auth.service";
 import { AuthorizationService } from "../authorization/authorization.service";
@@ -31,7 +31,7 @@ export class BranchController {
 
   @UseGuards(JwtAuthGuard)
   @Post()
-  async createBranch(@Body() data: Partial<Branch>) {
+  async createBranch(@Body() data: Prisma.BranchCreateInput) {
     return await this.prismaService.branch.create({
       data: {
         ...data,
@@ -58,7 +58,7 @@ export class BranchController {
   @Patch(":id")
   async updateBranch(
     @Param("id") id: string,
-    @Body() data: Partial<Branch>,
+    @Body() data: Prisma.BranchUpdateInput,
     @CurrentUser() currentUser: MyUserProfile
   ) {
     if (

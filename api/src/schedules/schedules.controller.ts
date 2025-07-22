@@ -10,7 +10,7 @@ import {
   Post,
   UseGuards,
 } from "@nestjs/common";
-import { Schedules } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { JwtAuthGuard } from "../auth/auth.guard";
 import { MyUserProfile } from "../auth/auth.service";
 import { AuthorizationService } from "../authorization/authorization.service";
@@ -47,7 +47,7 @@ export class SchedulesController {
   @Patch(":id")
   async updateSchedule(
     @Param("id") id: string,
-    @Body() data: Partial<Schedules>
+    @Body() data: Prisma.SchedulesUpdateInput
   ) {
     return await this.prismaService.schedules.update({
       where: {
