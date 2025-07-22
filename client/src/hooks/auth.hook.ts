@@ -12,7 +12,7 @@ export function useLogin() {
       email: string;
       password: string;
     }) => {
-      const response = await instance.post("/Users/login", { email, password });
+      const response = await instance.post("/Auth/login", { email, password });
       const decode = jwtDecode<any>(response.data.token);
       localStorage.setItem("token", response.data.token);
       localStorage.setItem(
@@ -62,7 +62,7 @@ export function useLogout() {
 export function useRefresh() {
   return useMutation({
     mutationFn: async () => {
-      const response = await instance.post("/Users/refresh", {
+      const response = await instance.post("/Auth/refresh", {
         refreshToken: localStorage.getItem("token"),
       });
       const decode = jwtDecode<any>(response.data.token);
