@@ -9,8 +9,10 @@ Organized adalah sistem digitalisasi klub karate yang dirancang untuk mengelola 
 Organized dibangun dengan teknologi sebagai berikut.
 | Bagian | Teknologi |
 | ------ | ------ |
+| Runtime | Node.js |
+| Package Manager | PNPM |
 | Database | MongoDB |
-| Backend | NestJS, Typescript (SEGERA MIGRASI KE NEST), Prisma|
+| Backend | NestJS, Typescript (SEGERA MIGRASI KE NEST), Prisma |
 | Frontend | React, Typescript, DaisyUI |
 
 ## Struktur
