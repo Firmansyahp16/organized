@@ -163,7 +163,7 @@ function RouteComponent() {
                 label="Type"
                 options={[
                   { label: "Schedules", value: "schedules" },
-                  { label: "Examinations", value: "examination" },
+                  { label: "Examinations", value: "examinations" },
                 ]}
                 defaultValue="schedules"
                 required
