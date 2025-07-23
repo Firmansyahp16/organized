@@ -181,3 +181,33 @@ export function useSetAttendance(id: string) {
     },
   });
 }
+
+export function useSetResult(id: string) {
+  return useMutation({
+    mutationFn: async (data: {
+      [userId: string]: {
+        kihon: string;
+        kata: string;
+        kumite: string;
+      };
+    }) => {
+      const response = await instance.post(`/Events/${id}/setResults`, data, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+      return response.data;
+    },
+    onSuccess() {
+      toast.success("Result set successfully", {
+        autoClose: 2000,
+        onClose: () => {
+          window.location.reload();
+        },
+      });
+    },
+    onError(error) {
+      toast.error(error.message);
+    },
+  });
+}
