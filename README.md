@@ -183,4 +183,4 @@ Dashboard akan berjalan di `http://localhost:5173`
 Untuk pertanyaan atau saran, bisa melalui berikut.
 
 - [Email](mailto:firman.jka@gmail.com)
-- [LinkedIn](<[LinkedIn](https://www.linkedin.com/in/firmansyah-putra-p/)>)
+- [LinkedIn](https://www.linkedin.com/in/firmansyah-putra-p/)
