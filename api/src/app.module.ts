@@ -9,8 +9,9 @@ import { SchedulesModule } from './schedules/schedules.module';
 import { AttendancesModule } from './attendances/attendances.module';
 import { ExaminationsModule } from './examinations/examinations.module';
 import { EventsModule } from './events/events.module';
+import { FinancesModule } from './finances/finances.module';
 
 @Module({
-  imports: [ConfigModule.forRoot({ isGlobal: true }), UsersModule, AuthModule, AuthorizationModule, DashboardModule, BranchModule, SchedulesModule, AttendancesModule, ExaminationsModule, EventsModule],
+  imports: [ConfigModule.forRoot({ isGlobal: true }), UsersModule, AuthModule, AuthorizationModule, DashboardModule, BranchModule, SchedulesModule, AttendancesModule, ExaminationsModule, EventsModule, FinancesModule],
 })
 export class AppModule {}

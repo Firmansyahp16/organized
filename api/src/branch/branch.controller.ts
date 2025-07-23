@@ -10,11 +10,12 @@ import {
   Post,
   UseGuards,
 } from "@nestjs/common";
-import { Prisma } from "@prisma/client";
+import { Category, Flow, Prisma, SubCategory } from "@prisma/client";
 import { JwtAuthGuard } from "../auth/auth.guard";
 import { MyUserProfile } from "../auth/auth.service";
 import { AuthorizationService } from "../authorization/authorization.service";
 import { CurrentUser } from "../common/decorators/current.decorator";
+import { FinancesService } from "../finances/finances.service";
 import { generateID } from "../libs/generateID";
 import { PrismaService } from "../prisma/prisma.service";
 import { BranchService } from "./branch.service";
@@ -24,7 +25,8 @@ export class BranchController {
   constructor(
     private prismaService: PrismaService,
     private authorizationService: AuthorizationService,
-    private branchService: BranchService
+    private branchService: BranchService,
+    private financesService: FinancesService
   ) {}
 
   // Basic CRUD
@@ -309,5 +311,63 @@ export class BranchController {
       },
     });
     return true;
+  }
+
+  // Financing
+
+  @UseGuards(JwtAuthGuard)
+  @Get(":id/finances")
+  async getFinances(@Param("id") id: string) {
+    const funds = await this.prismaService.branch.findFirstOrThrow({
+      where: {
+        id: id,
+      },
+      select: {
+        funds: true,
+      },
+    });
+    const finances = await this.prismaService.finances.findMany({
+      where: {
+        branchId: id,
+      },
+      select: {
+        id: true,
+        date: true,
+        type: true,
+        category: true,
+        subCategory: true,
+        amount: true,
+        description: true,
+      },
+    });
+    return {
+      funds: funds.funds,
+      finances,
+    };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post(":id/finances")
+  async getFinance(
+    @Param("id") id: string,
+    @Body()
+    data: {
+      type: Flow;
+      category: Category;
+      subCategory: SubCategory;
+      amount: number;
+      description: string;
+    },
+    @CurrentUser() currentUser: MyUserProfile
+  ) {
+    return await this.financesService.createFinance(
+      data.type,
+      data.category,
+      data.subCategory,
+      data.amount,
+      data.description,
+      id,
+      currentUser
+    );
   }
 }

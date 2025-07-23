@@ -30,10 +30,17 @@ model Users {
   updatedAt DateTime? @updatedAt
 }
 
+type Funds {
+  current Int @default(0)
+  inflow Int @default(0)
+  outflow Int @default(0)
+}
+
 model Branch {
   id String @id @db.String @map("_id")
   name String?
   coachIds String[]
+  funds Funds?
   createdAt DateTime? @default(now())
   updatedAt DateTime? @updatedAt
 
@@ -42,6 +49,9 @@ model Branch {
 
   // Has many examinations
   examinations Examinations[]
+
+  // Has many finances
+  finances Finances[]
 }
 
 model Schedules {
@@ -133,4 +143,44 @@ model Events {
 
   // Only have 1 Attendances
   attendance Attendances?
+}
+
+enum Flow {
+  credit
+  debit
+}
+
+enum Category {
+  operating
+  investing
+  financing
+}
+
+enum SubCategory {
+  // operating
+  monthlyMemberFee
+  donation
+  allowance
+  salary
+  venue
+  consumableEquipment
+  // investing
+  assetsEquipment
+  // financing
+  memberLoan
+  other
+}
+
+model Finances {
+  id String @id @db.String @map("_id")
+  date DateTime?
+  amount Int?
+  type Flow?
+  category Category?
+  subCategory SubCategory?
+  description String?
+  
+  // Owned by 1 Branch
+  branchId String? @db.String
+  branch Branch? @relation(fields: [branchId],references: [id])
 }
