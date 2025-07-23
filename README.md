@@ -39,7 +39,7 @@ Organized menyediakan serangkaian fitur yang terbagi dalam beberapa kategori unt
 - **Autentikasi:** Menggunakan **JSON Web Tokens (JWT)**. Pengguna akan login menggunakan email dan password terdaftar.
 - **Otorisasi (RBAC):** Menerapkan Role-Based Access Control (RBAC) yang memungkinkan pengguna mengakses dan mengubah data berdasarkan _role_ mereka. _Role_ terbagi menjadi:
   - `globalRoles`: Peran global yang terdiri atas "unAssociated", "admin", "coachManager", dan "examiners".
-  - `branchRoles`: Peran spesifik pengguna di tiap cabang, seperti "member", "branchManager", "branchSupport", "examiners", dan "coach".
+  - `branchRoles`: Peran spesifik pengguna di tiap cabang, seperti "member", "branchManager", "branchSupport", dan "coach".
 
 ### 2. Manajemen Anggota
 

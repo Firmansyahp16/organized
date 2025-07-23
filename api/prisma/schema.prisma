@@ -13,9 +13,28 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum RolesForBranch {
+  member
+  branchManager
+  branchSupport
+  coach
+}
+
 type Roles {
   branchId String
-  roles String[]
+  roles RolesForBranch[]
+}
+
+enum GlobalRoles {
+  admin
+  unAssociated
+  coachManager
+  examiners
+}
+
+type BranchRoles {
+  id String
+  roles Roles[]
 }
 
 model Users {
@@ -24,8 +43,8 @@ model Users {
   email String? @unique
   hashedPassword String?
   rank String?
-  globalRoles String[]
-  branchRoles Roles[]
+  globalRoles GlobalRoles[]
+  branchRoles BranchRoles[]
   createdAt DateTime? @default(now())
   updatedAt DateTime? @updatedAt
 }
