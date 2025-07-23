@@ -141,7 +141,7 @@ cd organized
 
 ```bash
 cd api/
-npm install
+pnpm install
 cd ../client
 pnpm install
 ```
@@ -158,7 +158,7 @@ PORT=3000
 
 ```bash
 cd api
-npm start
+pnpm start:dev
 ```
 
 API akan berjalan di `http://localhost:3000`
@@ -175,6 +175,14 @@ Dashboard akan berjalan di `http://localhost:5173`
 **6. Eksplorasi Dashboard**
 
 - Untuk mencoba semua fitur di dashboard, login dengan menggunakan `admin@mail.com` dengan password `Admin123`
+
+**7. Prisma Migrate**
+
+Jika nantinya akan ada perubahan pada schema database yang digunakan, maka dapat merubah `schema.prisma` lalu menjalankan perintah berikut.
+
+```bash
+pnpm migrate
+```
 
 ---
 
