@@ -18,14 +18,16 @@ export function View({ event }: Props) {
         <div>
           <p className="font-bold">Branches</p>
           {event?.branchIds.map((branchId: string) => (
-            <Link
-              className="hover:underline"
-              to="/branch/$id"
-              params={{ id: branchId }}
-              key={branchId}
-            >
-              {branchId}
-            </Link>
+            <div className="grid w-fit">
+              <Link
+                className="hover:underline"
+                to="/branch/$id"
+                params={{ id: branchId }}
+                key={branchId}
+              >
+                {branchId}
+              </Link>
+            </div>
           ))}
         </div>
       </div>
