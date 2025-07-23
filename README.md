@@ -120,7 +120,13 @@ Untuk menjalankan Organized secara lokal, ikuti langkah berikut.
 
 - Node.js (v18 atau lebih tinggi direkomendasikan)
 - PNPM (Package Manager)
-- MongoDB Instance (lokal atau cloud)
+- MongoDB Instance
+
+### MongoDB Configuration
+
+- MongoDB dapat dijalankan lokal atau melalui docker
+- Jalankan mongodb dengan nama container yang anda mau
+- Buat user baru di collection admin dengan username dan password yang anda mau (catat untuk menggunakan di file _.env_)
 
 ### Installation
 
@@ -128,7 +134,7 @@ Untuk menjalankan Organized secara lokal, ikuti langkah berikut.
 
 ```bash
 git clone https://github.com/Firmansyahp16/Portofolio/tree/organized
-cd Organized
+cd organized
 ```
 
 **2. Install Dependencies**
@@ -143,7 +149,7 @@ pnpm install
 **3. Buat file _.env_ untuk API**
 
 ```bash
-DATABASE_URL="mongodb+srv://user:password@cluster.mongodb.net/organized_db?retryWrites=true&w=majority"
+DATABASE_URL="mongodb://user:password@localhost:27017/organized?authSource=admin"
 JWT_SECRET="supersecretkey"
 PORT=3000
 ```
@@ -177,4 +183,4 @@ Dashboard akan berjalan di `http://localhost:5173`
 Untuk pertanyaan atau saran, bisa melalui berikut.
 
 - [Email](mailto:firman.jka@gmail.com)
-- [LinkedIn](<(https://www.linkedin.com/in/firmansyah-putra-p/)>)
+- [LinkedIn](<[LinkedIn](https://www.linkedin.com/in/firmansyah-putra-p/)>)
