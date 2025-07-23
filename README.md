@@ -142,6 +142,8 @@ cd organized
 ```bash
 cd api/
 pnpm install
+# Jalankan ini untuk menginisialisasi dan membuat prisma client
+pnpm migrate
 cd ../client
 pnpm install
 ```
