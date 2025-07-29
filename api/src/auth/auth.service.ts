@@ -4,7 +4,7 @@ import {
   UnauthorizedException,
 } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
-import { Users } from "@prisma/client";
+import { GlobalRoles, Roles, Users } from "@prisma/client";
 import { comparePassword } from "../libs/hash";
 import { PrismaService } from "../prisma/prisma.service";
 
@@ -12,8 +12,8 @@ export interface MyUserProfile {
   sub?: string;
   name?: string;
   email?: string;
-  globalRoles: string[];
-  branchRoles: { branchId?: string; roles?: string[] }[];
+  globalRoles: GlobalRoles[];
+  branchRoles: Roles[];
 }
 
 @Injectable()
