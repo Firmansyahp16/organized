@@ -22,11 +22,8 @@ export class FinancesService {
   ) {
     if (
       !this.authorizationService.isAdmin(currentUser) &&
-      !this.authorizationService.isBranchManagerOfBranch(
-        currentUser,
-        branchId
-      ) &&
-      !this.authorizationService.isBranchSupportOfBranch(currentUser, branchId)
+      !this.authorizationService.isBranchManager(currentUser, branchId) &&
+      !this.authorizationService.isBranchSupport(currentUser, branchId)
     ) {
       throw new ForbiddenException("You are not authorized");
     }

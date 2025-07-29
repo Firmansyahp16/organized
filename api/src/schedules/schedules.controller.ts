@@ -47,8 +47,19 @@ export class SchedulesController {
   @Patch(":id")
   async updateSchedule(
     @Param("id") id: string,
-    @Body() data: Prisma.SchedulesUpdateInput
+    @Body() data: Prisma.SchedulesUpdateInput,
+    @CurrentUser() currentUser: MyUserProfile
   ) {
+    const schedule = await this.prismaService.schedules.findUniqueOrThrow({
+      where: {
+        id: id,
+      },
+    });
+    if (
+      !this.authorizationService.isCoach(currentUser, String(schedule.branchId))
+    ) {
+      throw new ForbiddenException("You are not authorized");
+    }
     return await this.prismaService.schedules.update({
       where: {
         id: id,
@@ -59,7 +70,20 @@ export class SchedulesController {
 
   @UseGuards(JwtAuthGuard)
   @Delete(":id")
-  async removeSchedule(@Param("id") id: string) {
+  async removeSchedule(
+    @Param("id") id: string,
+    @CurrentUser() currentUser: MyUserProfile
+  ) {
+    const schedule = await this.prismaService.schedules.findUniqueOrThrow({
+      where: {
+        id: id,
+      },
+    });
+    if (
+      !this.authorizationService.isCoach(currentUser, String(schedule.branchId))
+    ) {
+      throw new ForbiddenException("You are not authorized");
+    }
     return await this.prismaService.schedules.delete({
       where: {
         id: id,
@@ -76,12 +100,14 @@ export class SchedulesController {
     @Body() data: { id: string; status: "present" | "absence" }[],
     @CurrentUser() currentUser: MyUserProfile
   ) {
-    await this.prismaService.schedules.findUniqueOrThrow({
+    const schedule = await this.prismaService.schedules.findUniqueOrThrow({
       where: {
         id: id,
       },
     });
-    if (!this.authorizationService.isCoachOfBranch(currentUser, id)) {
+    if (
+      !this.authorizationService.isCoach(currentUser, String(schedule.branchId))
+    ) {
       throw new ForbiddenException("You are not authorized");
     }
     const attendanceData = data;
@@ -102,12 +128,14 @@ export class SchedulesController {
     @Body() data: { material: string },
     @CurrentUser() currentUser: MyUserProfile
   ) {
-    await this.prismaService.schedules.findUniqueOrThrow({
+    const schedule = await this.prismaService.schedules.findUniqueOrThrow({
       where: {
         id: id,
       },
     });
-    if (!this.authorizationService.isCoachOfBranch(currentUser, id)) {
+    if (
+      !this.authorizationService.isCoach(currentUser, String(schedule.branchId))
+    ) {
       throw new ForbiddenException("You are not authorized");
     }
     const { material } = data;

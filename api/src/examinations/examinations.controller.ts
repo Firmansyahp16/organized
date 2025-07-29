@@ -4,7 +4,6 @@ import {
   Delete,
   ForbiddenException,
   Get,
-  NotFoundException,
   Param,
   Patch,
   Post,
@@ -33,7 +32,18 @@ export class ExaminationsController {
 
   @UseGuards(JwtAuthGuard)
   @Post()
-  async create(@Body() data: Prisma.ExaminationsCreateInput) {
+  async create(
+    @Body() data: Prisma.ExaminationsCreateInput,
+    @CurrentUser() currentUser: MyUserProfile
+  ) {
+    if (
+      !this.authorizationService.isCoach(
+        currentUser,
+        String(data.branch?.connect?.id)
+      )
+    ) {
+      throw new ForbiddenException("You are not authorized");
+    }
     return await this.prismaService.examinations.create({
       data: {
         ...data,
@@ -60,8 +70,22 @@ export class ExaminationsController {
   @Patch(":id")
   async updateExamination(
     @Param("id") id: string,
-    @Body() data: Prisma.ExaminationsUpdateInput
+    @Body() data: Prisma.ExaminationsUpdateInput,
+    @CurrentUser() currentUser: MyUserProfile
   ) {
+    const examination = await this.prismaService.examinations.findUniqueOrThrow(
+      {
+        where: { id: id },
+      }
+    );
+    if (
+      !this.authorizationService.isCoach(
+        currentUser,
+        String(examination.branchId)
+      )
+    ) {
+      throw new ForbiddenException("You are not authorized");
+    }
     return await this.prismaService.examinations.update({
       where: {
         id: id,
@@ -72,7 +96,23 @@ export class ExaminationsController {
 
   @UseGuards(JwtAuthGuard)
   @Delete(":id")
-  async removeExamination(@Param("id") id: string) {
+  async removeExamination(
+    @Param("id") id: string,
+    @CurrentUser() currentUser: MyUserProfile
+  ) {
+    const examination = await this.prismaService.examinations.findUniqueOrThrow(
+      {
+        where: { id: id },
+      }
+    );
+    if (
+      !this.authorizationService.isCoach(
+        currentUser,
+        String(examination.branchId)
+      )
+    ) {
+      throw new ForbiddenException("You are not authorized");
+    }
     return await this.prismaService.examinations.delete({
       where: {
         id: id,
@@ -84,14 +124,26 @@ export class ExaminationsController {
 
   @UseGuards(JwtAuthGuard)
   @Get(":id/participants")
-  async getExaminationParticipants(@Param("id") id: string) {
+  async getExaminationParticipants(
+    @Param("id") id: string,
+    @CurrentUser() currentUser: MyUserProfile
+  ) {
     const examination = await this.prismaService.examinations.findUniqueOrThrow(
       {
         where: { id: id },
       }
     );
-    if (!examination) {
-      throw new NotFoundException("Examination not found");
+    if (
+      !this.authorizationService.isCoach(
+        currentUser,
+        String(examination.branchId)
+      ) &&
+      !this.authorizationService.isBranchManager(
+        currentUser,
+        String(examination.branchId)
+      )
+    ) {
+      throw new ForbiddenException("You are not authorized");
     }
     const participants = examination.participants ?? [];
     const result: { id: string; name: string; rank: string }[] = [];
@@ -119,7 +171,7 @@ export class ExaminationsController {
     },
     @CurrentUser() currentUser: MyUserProfile
   ) {
-    if (!this.authorizationService.isCoachOfBranch(currentUser, id)) {
+    if (!this.authorizationService.isCoach(currentUser, id)) {
       throw new ForbiddenException("You are not authorized");
     }
     const { auto, participants } = data;

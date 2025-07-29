@@ -10,7 +10,14 @@ import {
   Post,
   UseGuards,
 } from "@nestjs/common";
-import { Category, Flow, Prisma, SubCategory } from "@prisma/client";
+import {
+  Category,
+  Flow,
+  GlobalRoles,
+  Prisma,
+  Roles,
+  SubCategory,
+} from "@prisma/client";
 import { JwtAuthGuard } from "../auth/auth.guard";
 import { MyUserProfile } from "../auth/auth.service";
 import { AuthorizationService } from "../authorization/authorization.service";
@@ -33,7 +40,13 @@ export class BranchController {
 
   @UseGuards(JwtAuthGuard)
   @Post()
-  async createBranch(@Body() data: Prisma.BranchCreateInput) {
+  async createBranch(
+    @Body() data: Prisma.BranchCreateInput,
+    @CurrentUser() currentUser: MyUserProfile
+  ) {
+    if (!this.authorizationService.isAdmin(currentUser)) {
+      throw new ForbiddenException("You are not authorized");
+    }
     return await this.prismaService.branch.create({
       data: {
         ...data,
@@ -63,10 +76,7 @@ export class BranchController {
     @Body() data: Prisma.BranchUpdateInput,
     @CurrentUser() currentUser: MyUserProfile
   ) {
-    if (
-      !this.authorizationService.isAdmin(currentUser) &&
-      !this.authorizationService.isBranchManagerOfBranch(currentUser, id)
-    ) {
+    if (!this.authorizationService.isBranchManager(currentUser, id)) {
       throw new ForbiddenException("You are not authorized");
     }
     return await this.prismaService.branch.update({
@@ -81,14 +91,50 @@ export class BranchController {
     @Param("id") id: string,
     @CurrentUser() currentUser: MyUserProfile
   ) {
-    if (
-      !this.authorizationService.isAdmin(currentUser) &&
-      !this.authorizationService.isBranchManagerOfBranch(currentUser, id)
-    ) {
+    if (!this.authorizationService.isAdmin(currentUser)) {
       throw new ForbiddenException("You are not authorized");
     }
+
+    const [coaches, members, supports] = await Promise.all([
+      this.branchService.findCoaches(id),
+      this.branchService.findMembers(id),
+      this.branchService.findSupports(id),
+    ]);
+
+    const handleUserBranchRemoval = async (
+      user: { id: string; branchRoles: Roles[]; globalRoles: GlobalRoles[] },
+      fallbackGlobalRole: GlobalRoles
+    ) => {
+      const remainingRoles = user.branchRoles.filter(
+        (br) => br.branchId !== id
+      );
+      const newGlobalRoles = new Set(user.globalRoles ?? []);
+      if (remainingRoles.length === 0) {
+        newGlobalRoles.add(fallbackGlobalRole);
+      }
+      await this.prismaService.users.update({
+        where: { id: user.id },
+        data: {
+          branchRoles: remainingRoles,
+          globalRoles: Array.from(newGlobalRoles),
+        },
+      });
+    };
+
+    await Promise.all([
+      ...coaches.map((coach) =>
+        handleUserBranchRemoval(coach, "unAssignedCoach")
+      ),
+      ...members.map((member) =>
+        handleUserBranchRemoval(member, "unAssociated")
+      ),
+      ...supports.map((support) =>
+        handleUserBranchRemoval(support, "unAssociated")
+      ),
+    ]);
+
     return await this.prismaService.branch.delete({
-      where: { id: id },
+      where: { id },
     });
   }
 
@@ -113,22 +159,15 @@ export class BranchController {
     @Body() data: { coachIds: string[] },
     @CurrentUser() currentUser: MyUserProfile
   ) {
-    if (
-      !this.authorizationService.isAdmin(currentUser) &&
-      !this.authorizationService.isBranchManagerOfBranch(currentUser, id) &&
-      !this.authorizationService.isCoachManager(currentUser)
-    ) {
+    if (!this.authorizationService.isCoachManager(currentUser)) {
       throw new ForbiddenException("You are not authorized");
     }
 
     const { coachIds } = data;
 
-    const branch = await this.prismaService.branch.findUnique({
+    const branch = await this.prismaService.branch.findUniqueOrThrow({
       where: { id: id },
     });
-    if (!branch) {
-      throw new NotFoundException("Branch not found");
-    }
 
     const oldCoachIds = branch.coachIds ?? [];
 
@@ -149,17 +188,17 @@ export class BranchController {
             if (br.branchId === id) {
               return {
                 branchId: br.branchId,
-                roles: (br.roles ?? []).filter((role) => role !== "coach"),
+                roles: br.roles.filter((r) => r !== "coach"),
               };
             }
             return br;
           })
-          .filter((br) => (br.roles?.length ?? 0) > 0);
+          .filter((br) => br.roles.length > 0);
 
         const globalRoles = coach.globalRoles ?? [];
 
-        if (!globalRoles.includes("unassignedCoach")) {
-          globalRoles.push("unassignedCoach");
+        if (!globalRoles.includes("unAssignedCoach")) {
+          globalRoles.push("unAssignedCoach");
         }
 
         await this.prismaService.users.update({
@@ -205,7 +244,7 @@ export class BranchController {
         data: {
           branchRoles,
           globalRoles: coach.globalRoles.filter(
-            (role) => role !== "unassignedCoach"
+            (role) => role !== "unAssignedCoach"
           ),
         },
       });
@@ -233,7 +272,7 @@ export class BranchController {
     },
     @CurrentUser() currentUser: MyUserProfile
   ) {
-    if (!this.authorizationService.isCoachOfBranch(currentUser, id)) {
+    if (!this.authorizationService.isCoach(currentUser, id)) {
       throw new ForbiddenException("You are not authorized");
     }
     await this.prismaService.branch.findUnique({
@@ -293,7 +332,7 @@ export class BranchController {
     },
     @CurrentUser() currentUser: MyUserProfile
   ) {
-    if (!this.authorizationService.isCoachOfBranch(currentUser, id)) {
+    if (!this.authorizationService.isCoach(currentUser, id)) {
       throw new ForbiddenException("You are not authorized");
     }
     await this.prismaService.branch.findUniqueOrThrow({
@@ -317,7 +356,16 @@ export class BranchController {
 
   @UseGuards(JwtAuthGuard)
   @Get(":id/finances")
-  async getFinances(@Param("id") id: string) {
+  async getFinances(
+    @Param("id") id: string,
+    @CurrentUser() currentUser: MyUserProfile
+  ) {
+    if (
+      !this.authorizationService.isBranchManager(currentUser, id) &&
+      !this.authorizationService.isBranchSupport(currentUser, id)
+    ) {
+      throw new ForbiddenException("You are not authorized");
+    }
     const funds = await this.prismaService.branch.findFirstOrThrow({
       where: {
         id: id,
@@ -360,6 +408,12 @@ export class BranchController {
     },
     @CurrentUser() currentUser: MyUserProfile
   ) {
+    if (
+      !this.authorizationService.isBranchManager(currentUser, id) &&
+      !this.authorizationService.isBranchSupport(currentUser, id)
+    ) {
+      throw new ForbiddenException("You are not authorized");
+    }
     return await this.financesService.createFinance(
       data.type,
       data.category,

@@ -34,4 +34,19 @@ export class BranchService {
       },
     });
   }
+
+  async findSupports(id: string) {
+    return await this.prismaService.users.findMany({
+      where: {
+        branchRoles: {
+          some: {
+            branchId: id,
+            roles: {
+              hasSome: ["branchSupport", "branchManager"],
+            },
+          },
+        },
+      },
+    });
+  }
 }

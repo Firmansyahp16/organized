@@ -4,13 +4,12 @@ import {
   Delete,
   ForbiddenException,
   Get,
-  NotFoundException,
   Param,
   Patch,
   Post,
   UseGuards,
 } from "@nestjs/common";
-import { Prisma } from "@prisma/client";
+import { Prisma, RolesForBranch } from "@prisma/client";
 import { JwtAuthGuard } from "../auth/auth.guard";
 import { MyUserProfile } from "../auth/auth.service";
 import { AuthorizationService } from "../authorization/authorization.service";
@@ -29,7 +28,16 @@ export class UsersController {
 
   @UseGuards(JwtAuthGuard)
   @Post()
-  async createUser(@Body() data: Prisma.UsersCreateInput) {
+  async createUser(
+    @Body() data: Prisma.UsersCreateInput,
+    @CurrentUser() currentUser: MyUserProfile
+  ) {
+    if (
+      !this.authorizationService.isAdmin(currentUser) &&
+      !this.authorizationService.isCoachManager(currentUser)
+    ) {
+      throw new ForbiddenException("You are not authorized");
+    }
     return await this.prismaService.users.create({
       data: {
         ...data,
@@ -47,13 +55,9 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   @Get(":id")
   async getUser(@Param("id") id: string) {
-    const user = await this.prismaService.users.findUnique({
+    return await this.prismaService.users.findUniqueOrThrow({
       where: { id: id },
     });
-    if (!user) {
-      throw new NotFoundException("User not found");
-    }
-    return user;
   }
 
   @UseGuards(JwtAuthGuard)
@@ -64,10 +68,7 @@ export class UsersController {
     data: Prisma.UsersUpdateInput,
     @CurrentUser() currentUser: MyUserProfile
   ) {
-    if (
-      !this.authorizationService.isCurrentUser(currentUser, id) &&
-      !this.authorizationService.isAdmin(currentUser)
-    ) {
+    if (!this.authorizationService.isCurrentUser(currentUser, id)) {
       throw new ForbiddenException("You are not authorized");
     }
     return await this.prismaService.users.update({
@@ -82,10 +83,7 @@ export class UsersController {
     @Param("id") id: string,
     @CurrentUser() currentUser: MyUserProfile
   ) {
-    if (
-      !this.authorizationService.isCurrentUser(currentUser, id) &&
-      !this.authorizationService.isAdmin(currentUser)
-    ) {
+    if (!this.authorizationService.isCurrentUser(currentUser, id)) {
       throw new ForbiddenException("You are not authorized");
     }
     return await this.prismaService.users.delete({
@@ -109,22 +107,36 @@ export class UsersController {
     if (!this.authorizationService.isCurrentUser(currentUser, id)) {
       throw new ForbiddenException("You are not authorized");
     }
-    const user = await this.prismaService.users.findUnique({
+    const user = await this.prismaService.users.findUniqueOrThrow({
       where: { id: id },
     });
-    if (!user) {
-      throw new NotFoundException("User not found");
+    const validRoles: RolesForBranch[] = (data.roles ?? []).filter((role) =>
+      ["member", "branchManager", "branchSupport", "coach"].includes(role)
+    ) as RolesForBranch[];
+    const existing = user.branchRoles?.find(
+      (br) => br.branchId === data.branchId
+    );
+    let updatedBranchRoles: typeof user.branchRoles;
+    if (existing) {
+      const newRoles = Array.from(new Set([...existing.roles, ...validRoles]));
+      updatedBranchRoles = user.branchRoles.map((br) =>
+        br.branchId === data.branchId
+          ? { branchId: br.branchId, roles: newRoles }
+          : br
+      );
+    } else {
+      updatedBranchRoles = [
+        ...(user.branchRoles ?? []),
+        {
+          branchId: data.branchId,
+          roles: validRoles,
+        },
+      ];
     }
     return await this.prismaService.users.update({
       where: { id: id },
       data: {
-        branchRoles: [
-          ...(user.branchRoles ?? []),
-          {
-            branchId: data.branchId,
-            roles: data.roles,
-          },
-        ],
+        branchRoles: updatedBranchRoles,
       },
     });
   }

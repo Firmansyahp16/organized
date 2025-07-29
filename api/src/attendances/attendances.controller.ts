@@ -2,36 +2,30 @@ import {
   Body,
   Controller,
   Delete,
+  ForbiddenException,
   Get,
   Param,
   Patch,
-  Post,
   UseGuards,
 } from "@nestjs/common";
 import { Prisma } from "@prisma/client";
 import { JwtAuthGuard } from "../auth/auth.guard";
-import { generateID } from "../libs/generateID";
+import { MyUserProfile } from "../auth/auth.service";
+import { AuthorizationService } from "../authorization/authorization.service";
+import { CurrentUser } from "../common/decorators/current.decorator";
 import { PrismaService } from "../prisma/prisma.service";
 
 @Controller("Attendances")
 export class AttendancesController {
-  constructor(private prismaService: PrismaService) {}
+  constructor(
+    private prismaService: PrismaService,
+    private authorizationService: AuthorizationService
+  ) {}
 
   // Basic CRUD
 
   @UseGuards(JwtAuthGuard)
-  @Post()
-  async create(@Body() data: Prisma.AttendancesCreateInput) {
-    return await this.prismaService.attendances.create({
-      data: {
-        ...data,
-        id: generateID("ATT"),
-      },
-    });
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Get()
+  @Get("")
   async getAllAttendances() {
     return await this.prismaService.attendances.findMany();
   }
@@ -50,8 +44,25 @@ export class AttendancesController {
   @Patch(":id")
   async updateAttendance(
     @Param("id") id: string,
-    @Body() data: Prisma.AttendancesUpdateInput
+    @Body() data: Prisma.AttendancesUpdateInput,
+    @CurrentUser() currentUser: MyUserProfile
   ) {
+    const attendance = await this.prismaService.attendances.findUniqueOrThrow({
+      where: {
+        id: id,
+      },
+      include: {
+        schedule: true,
+      },
+    });
+    if (
+      !this.authorizationService.isCoach(
+        currentUser,
+        String(attendance?.schedule?.branchId)
+      )
+    ) {
+      throw new ForbiddenException("You are not authorized");
+    }
     return await this.prismaService.attendances.update({
       where: {
         id: id,
@@ -62,7 +73,26 @@ export class AttendancesController {
 
   @UseGuards(JwtAuthGuard)
   @Delete(":id")
-  async removeAttendance(@Param("id") id: string) {
+  async removeAttendance(
+    @Param("id") id: string,
+    @CurrentUser() currentUser: MyUserProfile
+  ) {
+    const attendance = await this.prismaService.attendances.findUniqueOrThrow({
+      where: {
+        id: id,
+      },
+      include: {
+        schedule: true,
+      },
+    });
+    if (
+      !this.authorizationService.isCoach(
+        currentUser,
+        String(attendance.schedule?.branchId)
+      )
+    ) {
+      throw new ForbiddenException("You are not authorized");
+    }
     return await this.prismaService.attendances.delete({
       where: {
         id: id,

@@ -33,7 +33,13 @@ export class EventsController {
 
   @UseGuards(JwtAuthGuard)
   @Post()
-  async createEvent(@Body() data: Prisma.EventsCreateInput) {
+  async createEvent(
+    @Body() data: Prisma.EventsCreateInput,
+    @CurrentUser() currentUser: MyUserProfile
+  ) {
+    if (!this.authorizationService.isCoachManager(currentUser)) {
+      throw new ForbiddenException("You are not authorized");
+    }
     return await this.prismaService.events.create({
       data: {
         ...data,
@@ -60,8 +66,12 @@ export class EventsController {
   @Patch(":id")
   async updateEvent(
     @Param("id") id: string,
-    @Body() data: Prisma.EventsUpdateInput
+    @Body() data: Prisma.EventsUpdateInput,
+    @CurrentUser() currentUser: MyUserProfile
   ) {
+    if (!this.authorizationService.isCoachManager(currentUser)) {
+      throw new ForbiddenException("You are not authorized");
+    }
     return await this.prismaService.events.update({
       where: {
         id: id,
@@ -72,7 +82,13 @@ export class EventsController {
 
   @UseGuards(JwtAuthGuard)
   @Delete(":id")
-  async removeEvent(@Param("id") id: string) {
+  async removeEvent(
+    @Param("id") id: string,
+    @CurrentUser() currentUser: MyUserProfile
+  ) {
+    if (!this.authorizationService.isCoachManager(currentUser)) {
+      throw new ForbiddenException("You are not authorized");
+    }
     return await this.prismaService.events.delete({
       where: {
         id: id,
@@ -120,10 +136,7 @@ export class EventsController {
     const event = await this.prismaService.events.findUniqueOrThrow({
       where: { id: id },
     });
-    if (
-      !this.authorizationService.isAdmin(currentUser) &&
-      !this.authorizationService.isCoachOfBranch(currentUser, event.branchIds)
-    ) {
+    if (!this.authorizationService.isCoachManager(currentUser)) {
       throw new ForbiddenException("You are not authorized");
     }
     const eventDate = new Date(event.date as Date);
@@ -276,10 +289,7 @@ export class EventsController {
         id: id,
       },
     });
-    if (
-      !this.authorizationService.isAdmin(currentUser) &&
-      !this.authorizationService.isCoachOfBranch(currentUser, event.branchIds)
-    ) {
+    if (!this.authorizationService.isCoachManager(currentUser)) {
       throw new ForbiddenException("You are not authorized");
     }
     return await this.prismaService.events.update({
@@ -312,8 +322,8 @@ export class EventsController {
       },
     });
     if (
-      !this.authorizationService.isAdmin(currentUser) &&
-      !this.authorizationService.isCoachOfBranch(currentUser, event.branchIds)
+      !this.authorizationService.isCoachManager(currentUser) &&
+      !this.authorizationService.isExaminer(currentUser, undefined, event)
     ) {
       throw new ForbiddenException("You are not authorized");
     }
@@ -365,8 +375,8 @@ export class EventsController {
       },
     });
     if (
-      !this.authorizationService.isAdmin(currentUser) &&
-      !this.authorizationService.isCoachOfBranch(currentUser, event.branchIds)
+      !this.authorizationService.isCoachManager(currentUser) &&
+      !this.authorizationService.isCoach(currentUser, event.branchIds)
     ) {
       throw new ForbiddenException("You are not authorized");
     }
