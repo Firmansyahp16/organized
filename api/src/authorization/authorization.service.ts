@@ -1,89 +1,80 @@
 import { Injectable } from "@nestjs/common";
-import { Examinations } from "@prisma/client";
+import { Events, Examinations } from "@prisma/client";
 import { MyUserProfile } from "../auth/auth.service";
 
 @Injectable()
 export class AuthorizationService {
-  isAdmin(user: MyUserProfile): boolean {
-    return user.globalRoles?.includes("admin") || false;
+  isAdmin(user: MyUserProfile) {
+    return user.globalRoles.includes("admin");
   }
 
-  isCoachManager(user: MyUserProfile): boolean {
-    return user.globalRoles?.includes("coachManager") || false;
-  }
-
-  isCoachOfBranch(user: MyUserProfile, branchId: string | string[]): boolean {
+  isCurrentUser(user: MyUserProfile, id: string) {
     if (this.isAdmin(user)) {
       return true;
     }
-    const branchIds = Array.isArray(branchId) ? branchId : [branchId];
-    return (
-      user.branchRoles?.some(
-        (br) =>
-          branchIds.includes(String(br.branchId)) && br.roles?.includes("coach")
-      ) || false
+    return user.sub === id;
+  }
+
+  isCoachManager(user: MyUserProfile) {
+    if (this.isAdmin(user)) {
+      return true;
+    }
+    return user.globalRoles.includes("coachManager");
+  }
+
+  isBranchManager(user: MyUserProfile, branchId: string) {
+    if (this.isAdmin(user)) {
+      return true;
+    }
+    return user.branchRoles.some(
+      (br) => br.branchId === branchId && br.roles.includes("branchManager")
     );
   }
 
-  isBranchManagerOfBranch(user: MyUserProfile, branchId: string): boolean {
+  isBranchSupport(user: MyUserProfile, branchId: string) {
     if (this.isAdmin(user)) {
       return true;
     }
-    return (
-      user.branchRoles?.some(
-        (br) => br.branchId === branchId && br.roles?.includes("branchManager")
-      ) || false
+    return user.branchRoles.some(
+      (br) => br.branchId === branchId && br.roles.includes("branchSupport")
     );
   }
 
-  isBranchSupportOfBranch(user: MyUserProfile, branchId: string): boolean {
+  isCoach(user: MyUserProfile, branchId: string | string[]) {
     if (this.isAdmin(user)) {
       return true;
     }
-    return (
-      user.branchRoles?.some(
-        (br) => br.branchId === branchId && br.roles?.includes("branchSupport")
-      ) || false
+    const branchIdArray = Array.isArray(branchId) ? branchId : [branchId];
+    return user.branchRoles.some((br) =>
+      branchIdArray.includes(String(br.branchId))
     );
   }
 
-  isExaminer(user: MyUserProfile, examination?: Examinations): boolean {
+  isMember(user: MyUserProfile, branchId: string) {
     if (this.isAdmin(user)) {
       return true;
     }
-    if (user.globalRoles?.includes("examiners")) {
-      return true;
-    }
-    if (examination && examination.examiners && user.sub) {
-      return examination.examiners.includes(user.sub);
-    }
-    return false;
-  }
-
-  hasGlobalRole(user: MyUserProfile, role: string): boolean {
-    return user.globalRoles?.includes(role) || false;
-  }
-
-  hasRoleInBranch(
-    user: MyUserProfile,
-    branchId: string,
-    role: string
-  ): boolean {
-    if (this.isAdmin(user)) {
-      return true;
-    }
-    return (
-      user.branchRoles?.some(
-        (br) => br.branchId === branchId && br.roles?.includes(role)
-      ) || false
+    return user.branchRoles.some(
+      (br) => br.branchId === branchId && br.roles.includes("member")
     );
   }
 
-  isCurrentUser(user: MyUserProfile, userId: string): boolean {
-    return user.sub === userId;
+  isExaminer(user: MyUserProfile, examination?: Examinations, event?: Events) {
+    if (this.isAdmin(user)) {
+      return true;
+    }
+    if (examination) {
+      return examination.examiners.includes(String(user.sub));
+    }
+    if (event) {
+      return event.examiners.includes(String(user.sub));
+    }
   }
 
-  isAssociatedWithAnyBranch(user: MyUserProfile): boolean {
-    return (user.branchRoles?.length ?? 0) > 0;
+  isUnAssociated(user: MyUserProfile) {
+    if (this.isAdmin(user)) {
+      return true;
+    }
+    return user.globalRoles.includes("unAssociated");
   }
 }
