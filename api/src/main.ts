@@ -10,6 +10,7 @@ async function bootstrap() {
     AppModule,
     new FastifyAdapter(),
     {
+      // Uncomment to show all logs
       // logger: ["error", "warn", "log", "verbose", "debug"],
       logger: false,
       cors: true,
