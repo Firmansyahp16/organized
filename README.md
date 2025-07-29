@@ -38,12 +38,12 @@ Organized menyediakan serangkaian fitur yang terbagi dalam beberapa kategori unt
 
 - **Autentikasi:** Menggunakan **JSON Web Tokens (JWT)**. Pengguna akan login menggunakan email dan password terdaftar.
 - **Otorisasi (RBAC):** Menerapkan Role-Based Access Control (RBAC) yang memungkinkan pengguna mengakses dan mengubah data berdasarkan _role_ mereka. _Role_ terbagi menjadi:
-  - `globalRoles`: Peran global yang terdiri atas "unAssociated", "admin", "coachManager", dan "examiners".
+  - `globalRoles`: Peran global yang terdiri atas "unAssociated", "admin", dan "coachManager".
   - `branchRoles`: Peran spesifik pengguna di tiap cabang, seperti "member", "branchManager", "branchSupport", dan "coach".
 
 ### 2. Manajemen Anggota
 
-- Pendaftaran Anggota: Pengguna dapat mendaftarkan diri melalui web dan secara otomatis mendapatkan `globalRoles` "unAssociated" sebelum terdaftar di cabang manapun.
+- Pendaftaran Anggota: Pengguna dapat mendaftarkan diri melalui web dan secara otomatis mendapatkan `globalRoles` `unAssociated` sebelum terdaftar di cabang manapun.
 - Pilihan Cabang: Pengguna dapat melihat profil cabang untuk pertimbangan sebelum mendaftar.
 - Penentuan Pelatih: Pelatih (`coach` di cabang) dapat ditentukan oleh Admin pusat (`admin` di global) atau Manajer Cabang (`branchManager` di cabang).
 
@@ -55,7 +55,7 @@ Organized menyediakan serangkaian fitur yang terbagi dalam beberapa kategori unt
 
 ### 4. Ujian Kenaikan Tingkat
 
-- Pengelolaan Ujian: Ujian kenaikan dibuat oleh Pelatih (`coach` di cabang) yang juga dapat mengatur Penguji (`examiners` di cabang).
+- Pengelolaan Ujian: Ujian kenaikan dibuat oleh Pelatih (`coach` di cabang) yang juga dapat mengatur Penguji (`examiners` di cabang). Peran `examiners` bukan merupakan peran tetap yang terdaftar baik di `globalRoles` atau pun `branchRoles`
 - Pendaftaran Peserta: Pelatih dapat mengatur peserta ujian dengan dua opsi: otomatis (dihitung 80% + 4 kehadiran) atau manual.
 - Penilaian: Penilaian hanya dapat diberikan oleh Penguji dengan kriteria sebagai berikut:
 
