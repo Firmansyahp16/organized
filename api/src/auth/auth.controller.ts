@@ -38,7 +38,6 @@ export class AuthController {
       email: string;
       password: string;
       rank: string;
-      role?: string[];
     }
   ) {
     const existingUser = await this.prismaService.users.findUnique({
@@ -63,7 +62,7 @@ export class AuthController {
         email: body.email,
         hashedPassword: hashed,
         rank: body.rank,
-        globalRoles: body.role ? body.role : ["notAssociated"],
+        globalRoles: ["unAssociated"],
       },
     });
     const profile = this.authService.convertToProfile(user);
