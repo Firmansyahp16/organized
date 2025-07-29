@@ -105,10 +105,22 @@ Organized menyediakan serangkaian fitur yang terbagi dalam beberapa kategori unt
 - Sistem dapat membuat kartu anggota digital dengan QR/Barcode untuk presensi atau pendaftaran kegiatan.
 - Dapat dicetak dan digunakan oleh seluruh bagian dari Organized.
 
-### 9. Keuangan (SEGERA)
+### 9. Keuangan
 
-- Mencatat laporan keuangan keluar-masuk untuk cabang (kas, iuran, pembayaran).
-- Menyediakan grafik arus keuangan untuk monitoring.
+Fitur keuangan dirancang untuk mengelola arus kas masuk (credit) dan keluar (debit) di setiap cabang, memberikan gambaran komprehensif tentang kesehatan finansial. Hanya pengguna dengan peran `branchManager` dan `branchSupport` yang dapat melakukan manipulasi data (CREATE, READ, UPDATE, DELETE).
+
+- **Pencatatan Transaksi:** Mencatat tiap transaksi keuangan keluar-masuk dengan detail sebagai berikut.
+  - Amount: Nominal transaksi.
+  - Type: Jenis transaksi berupa `credit` (pemasukan) atau `debit` (pengeluaran).
+  - Category: Kategori transaksi berupa `operating`, `investing`, atau `financing`.
+  - Sub Category: Rincian lanjut berdasarkan kategori yang dapat meliput:
+    - `operating`: `monthlyMemberFee`, `donation`, `allowance` (pemasukan); `salary`, `venue`, `consumableEquipment` (pengeluaran).
+    - `investing`: `assetsEquipment` (untuk pembelian aset).
+    - `financing`: `memberLoan` (pinjaman anggota), `other` (lain-lain).
+  - Description: Keterangan singkat mengenai transaksi.
+  - Date: Tanggal transaksi
+- **Manajemen Berdasarkan Cabang:** Setiap transaksi terkait dengan satu cabang yang memungkinkan untuk melakukan pelacakan keuangan per cabang secara akurat.
+- **Visualisasi Data:** Menyediakan grafik arus keuangan tiap cabang (SEGERA).
 
 ---
 
