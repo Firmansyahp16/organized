@@ -29,7 +29,6 @@ enum GlobalRoles {
   admin
   unAssociated
   coachManager
-  examiners
   unAssignedCoach
 }
 
