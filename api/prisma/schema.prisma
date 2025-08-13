@@ -22,7 +22,7 @@ enum RolesForBranch {
 
 type Roles {
   branchId String
-  roles RolesForBranch[]
+  roles    RolesForBranch[]
 }
 
 enum GlobalRoles {
@@ -33,28 +33,28 @@ enum GlobalRoles {
 }
 
 model Users {
-  id String @id @db.String @map("_id")
-  fullName String?
-  email String? @unique
+  id             String        @id @map("_id") @db.String
+  fullName       String?
+  email          String?       @unique
   hashedPassword String?
-  rank String?
-  globalRoles GlobalRoles[]
-  branchRoles Roles[]
-  createdAt DateTime? @default(now())
-  updatedAt DateTime? @updatedAt
+  rank           String?
+  globalRoles    GlobalRoles[]
+  branchRoles    Roles[]
+  createdAt      DateTime?     @default(now())
+  updatedAt      DateTime?     @updatedAt
 }
 
 type Funds {
   current Int @default(0)
-  inflow Int @default(0)
+  inflow  Int @default(0)
   outflow Int @default(0)
 }
 
 model Branch {
-  id String @id @db.String @map("_id")
-  name String?
-  coachIds String[]
-  funds Funds?
+  id        String    @id @map("_id") @db.String
+  name      String?
+  coachIds  String[]
+  funds     Funds?
   createdAt DateTime? @default(now())
   updatedAt DateTime? @updatedAt
 
@@ -69,16 +69,16 @@ model Branch {
 }
 
 model Schedules {
-  id String @id @db.String @map("_id")
-  title String?
-  date DateTime?
-  material String?
+  id        String    @id @map("_id") @db.String
+  title     String?
+  date      DateTime?
+  material  String?
   createdAt DateTime? @default(now())
   updatedAt DateTime? @updatedAt
 
   // Owned by 1 Branch
   branchId String? @db.String
-  branch Branch? @relation(fields: [branchId], references: [id])
+  branch   Branch? @relation(fields: [branchId], references: [id])
 
   // Only have 1 Attendances
   attendance Attendances?
@@ -90,27 +90,27 @@ enum StatusType {
 }
 
 type Details {
-  id String
+  id     String
   status StatusType
 }
 
 model Attendances {
-  id String @id @db.String @map("_id")
-  details Details[]
+  id        String    @id @map("_id") @db.String
+  details   Details[]
   createdAt DateTime? @default(now())
   updatedAt DateTime? @updatedAt
 
   // Owned by 1 Schedule
-  scheduleId String? @db.String @unique
-  schedule Schedules? @relation(fields: [scheduleId],references: [id])
+  scheduleId String?    @unique @db.String
+  schedule   Schedules? @relation(fields: [scheduleId], references: [id])
 
   // Owned by 1 Events
-  eventId String? @db.String @unique
-  event Events? @relation(fields: [eventId],references: [id])
+  eventId String? @unique @db.String
+  event   Events? @relation(fields: [eventId], references: [id])
 }
 
 type Participants {
-  id String
+  id   String
   rank String
 }
 
@@ -122,18 +122,18 @@ type Score {
 }
 
 model Examinations {
-  id String @id @db.String @map("_id")
-  title String?
-  date DateTime?
+  id           String         @id @map("_id") @db.String
+  title        String?
+  date         DateTime?
   participants Participants[]
-  results Score? @map("results")
-  examiners String[]
-  createdAt DateTime? @default(now())
-  updatedAt DateTime? @updatedAt
+  results      Score?         @map("results")
+  examiners    String[]
+  createdAt    DateTime?      @default(now())
+  updatedAt    DateTime?      @updatedAt
 
   // Owned by 1 Branch
   branchId String? @db.String
-  branch Branch? @relation(fields: [branchId],references: [id])
+  branch   Branch? @relation(fields: [branchId], references: [id])
 }
 
 enum EventType {
@@ -143,17 +143,17 @@ enum EventType {
 }
 
 model Events {
-  id String @id @db.String @map("_id")
-  title String?
-  description String?
-  date DateTime?
-  type EventType?
-  branchIds String[]
+  id           String         @id @map("_id") @db.String
+  title        String?
+  description  String?
+  date         DateTime?
+  type         EventType?
+  branchIds    String[]
   participants Participants[]
-  examiners String[]
-  results Score? @map("results")
-  createdAt DateTime? @default(now())
-  updatedAt DateTime? @updatedAt
+  examiners    String[]
+  results      Score?         @map("results")
+  createdAt    DateTime?      @default(now())
+  updatedAt    DateTime?      @updatedAt
 
   // Only have 1 Attendances
   attendance Attendances?
@@ -186,15 +186,15 @@ enum SubCategory {
 }
 
 model Finances {
-  id String @id @db.String @map("_id")
-  date DateTime?
-  amount Int?
-  type Flow?
-  category Category?
+  id          String       @id @map("_id") @db.String
+  date        DateTime?
+  amount      Int?
+  type        Flow?
+  category    Category?
   subCategory SubCategory?
   description String?
-  
+
   // Owned by 1 Branch
   branchId String? @db.String
-  branch Branch? @relation(fields: [branchId],references: [id])
+  branch   Branch? @relation(fields: [branchId], references: [id])
 }

@@ -8,7 +8,7 @@
     "start": "nest start",
     "start:dev": "nest start --watch",
     "start:prod": "node .",
-    "migrate": "npx prisma db push && npx prisma generate"
+    "migrate": "npx prisma format && npx prisma db push && npx prisma generate"
   },
   "keywords": [],
   "author": "",
